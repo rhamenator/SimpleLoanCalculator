@@ -1,0 +1,11 @@
+this.txtType1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtType1_KeyPress);
+
+.
+.
+.
+
+private void txtType2_KeyPress(object sender, KeyPressEventArgs e)
+{
+     if (!System.Text.RegularExpressions.Regex.IsMatch(e.KeyChar.ToString(), "\\d+"))
+          e.Handled = true;
+}
