@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
 namespace LoanCalculator
@@ -15,15 +14,13 @@ namespace LoanCalculator
         }
         private void UpdateLoan()
         {
-            double result;
-            int intResult;
-            Loan.TradeIn = double.TryParse(txtTradeIn.Text, out result) ? result : 0;
+            Loan.TradeIn = double.TryParse(txtTradeIn.Text, out double result) ? result : 0;
             Loan.AmountStillOwed = double.TryParse(txtAmountStillOwed.Text, out result) ? result : 0;
             Loan.DownPayment = double.TryParse(txtDownPayment.Text, out result) ? result : 0;
             Loan.CalculateCompensatingBalance();
             Loan.SalePrice = double.TryParse(txtSalePrice.Text, out result) ? result : 0;
             Loan.CalculateAmountFinanced();
-            Loan.NumberPayments = int.TryParse(txtNumberPayments.Text, out intResult) ? intResult : 0;
+            Loan.NumberPayments = int.TryParse(txtNumberPayments.Text, out int intResult) ? intResult : 0;
             Loan.MonthlyPayment = double.TryParse(txtMonthlyPayment.Text, out result) ? result : 0;
             Loan.InterestRate = double.TryParse(txtInterestRate.Text, out result) ? result : 0;
             Loan.MonthlyPayment = double.TryParse(txtMonthlyPayment.Text, out result) ? result : 0;
@@ -68,7 +65,6 @@ namespace LoanCalculator
         {
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
                 e.Handled = true;
-
             if ((e.KeyChar == '.') && ((TextBox)sender).Text.IndexOf('.') > -1)
                 e.Handled = true;
         }
@@ -77,6 +73,32 @@ namespace LoanCalculator
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
                 e.Handled = true;
         }
+        private void Control_KeyUp(object sender, KeyEventArgs e)
+        {
+            if ((e.KeyCode == Keys.Enter) || (e.KeyCode == Keys.Return) || (e.KeyCode == Keys.Down))
+            {
+                this.SelectNextControl((Control)sender, true, true, true, true);
+                while (!this.ActiveControl.TabStop)
+                    this.SelectNextControl(this.ActiveControl, true, true, true, true);
+                e.Handled = true;
+            }
+            if (e.KeyCode == Keys.Up)
+            {
+                this.SelectNextControl((Control)sender, false, true, true, true);
+                while (!this.ActiveControl.TabStop)
+                    this.SelectNextControl(this.ActiveControl, false, true, true, true);
+                e.Handled = true;
+            }
+        }
+        //private void Control_KeyUp(object sender, KeyEventArgs e)
+        //{
+        //    if (e.KeyCode.Equals(Keys.Enter) || e.KeyCode.Equals(Keys.Return))
+        //        this.SelectNextControl((Control)sender, true, true, true, true);
+        //    else if (e.KeyCode == Keys.Up)
+        //        this.SelectNextControl((Control)sender, false, true, true, true);
+        //    else if (e.KeyCode == Keys.Down)
+        //        this.SelectNextControl((Control)sender, true, true, true, true);
+        //}
         private void btnSalePrice_Click(object sender, EventArgs e)
         {
             Loan.CalculateSalePrice();
@@ -88,7 +110,7 @@ namespace LoanCalculator
         {
             Loan.WhenDue = cbxDueAtMonthEnd.Checked ? DueDate.EndOfPeriod : DueDate.BegOfPeriod;
             Loan.CalculateInterestRate();
-            txtInterestRate.Text = Loan.InterestRate.ToString("N2");
+            txtInterestRate.Text = Loan.InterestRate.ToString("N4");
             RefreshControls();
         }
         private void btnPayment_Click(object sender, EventArgs e)
@@ -103,7 +125,7 @@ namespace LoanCalculator
             if (btnInterest.Enabled && Loan.NumberPayments > 0)
             {
                 Loan.CalculateInterestRate();
-                txtInterestRate.Text = Loan.InterestRate.ToString("N2");
+                txtInterestRate.Text = Loan.InterestRate.ToString("N4");
             }
             RefreshControls();
         }
