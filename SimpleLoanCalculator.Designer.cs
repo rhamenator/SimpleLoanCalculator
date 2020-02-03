@@ -166,7 +166,8 @@
             this.txtTradeIn.Name = "txtTradeIn";
             this.txtTradeIn.Size = new System.Drawing.Size(92, 20);
             this.txtTradeIn.TabIndex = 46;
-            this.txtTradeIn.TextChanged += new System.EventHandler(this.txtTradeIn_TextChanged);
+            this.txtTradeIn.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.KeyPressedDecimal);
+            this.txtTradeIn.Leave += new System.EventHandler(this.LeaveEventDecimal2);
             // 
             // txtAmountStillOwed
             // 
@@ -174,7 +175,8 @@
             this.txtAmountStillOwed.Name = "txtAmountStillOwed";
             this.txtAmountStillOwed.Size = new System.Drawing.Size(92, 20);
             this.txtAmountStillOwed.TabIndex = 47;
-            this.txtAmountStillOwed.TextChanged += new System.EventHandler(this.txtAmountStillOwed_TextChanged);
+            this.txtAmountStillOwed.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.KeyPressedDecimal);
+            this.txtAmountStillOwed.Leave += new System.EventHandler(this.LeaveEventDecimal2);
             // 
             // txtDownPayment
             // 
@@ -182,7 +184,8 @@
             this.txtDownPayment.Name = "txtDownPayment";
             this.txtDownPayment.Size = new System.Drawing.Size(92, 20);
             this.txtDownPayment.TabIndex = 48;
-            this.txtDownPayment.TextChanged += new System.EventHandler(this.txtDownPayment_TextChanged);
+            this.txtDownPayment.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.KeyPressedDecimal);
+            this.txtDownPayment.Leave += new System.EventHandler(this.LeaveEventDecimal2);
             // 
             // txtSalePrice
             // 
@@ -190,7 +193,8 @@
             this.txtSalePrice.Name = "txtSalePrice";
             this.txtSalePrice.Size = new System.Drawing.Size(92, 20);
             this.txtSalePrice.TabIndex = 49;
-            this.txtSalePrice.TextChanged += new System.EventHandler(this.txtSalePrice_TextChanged);
+            this.txtSalePrice.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.KeyPressedDecimal);
+            this.txtSalePrice.Leave += new System.EventHandler(this.LeaveEventDecimal2);
             // 
             // btnSalePrice
             // 
@@ -208,7 +212,8 @@
             this.txtNumberPayments.Name = "txtNumberPayments";
             this.txtNumberPayments.Size = new System.Drawing.Size(92, 20);
             this.txtNumberPayments.TabIndex = 51;
-            this.txtNumberPayments.TextChanged += new System.EventHandler(this.txtNumberPayments_TextChanged);
+            this.txtNumberPayments.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.KeyPressedInteger);
+            this.txtNumberPayments.Leave += new System.EventHandler(this.LeaveEventInteger);
             // 
             // btnNumPayments
             // 
@@ -226,7 +231,8 @@
             this.txtInterestRate.Name = "txtInterestRate";
             this.txtInterestRate.Size = new System.Drawing.Size(92, 20);
             this.txtInterestRate.TabIndex = 53;
-            this.txtInterestRate.TextChanged += new System.EventHandler(this.txtInterestRate_TextChanged);
+            this.txtInterestRate.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.KeyPressedDecimal);
+            this.txtInterestRate.Leave += new System.EventHandler(this.LeaveEventDecimal4);
             // 
             // btnInterest
             // 
@@ -244,7 +250,8 @@
             this.txtMonthlyPayment.Name = "txtMonthlyPayment";
             this.txtMonthlyPayment.Size = new System.Drawing.Size(92, 20);
             this.txtMonthlyPayment.TabIndex = 55;
-            this.txtMonthlyPayment.TextChanged += new System.EventHandler(this.txtMonthlyPayment_TextChanged);
+            this.txtMonthlyPayment.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.KeyPressedDecimal);
+            this.txtMonthlyPayment.Leave += new System.EventHandler(this.LeaveEventDecimal2);
             // 
             // cbxDueAtMonthEnd
             // 

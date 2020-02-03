@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
 namespace LoanCalculator
@@ -10,89 +11,91 @@ namespace LoanCalculator
             InitializeComponent();
             btnInterest.Enabled = false;
             cbxDueAtMonthEnd.Checked = false;
-            refreshControls();
+            RefreshControls();
         }
-        private void refreshControls()
+        private void UpdateLoan()
         {
-            txtTradeIn.Text = Loan.TradeIn != 0 ? Loan.TradeIn.ToString() : "";
-            txtCompensatingBalance.Text = Loan.CompensatingBalance != 0 ? Loan.CompensatingBalance.ToString() : "";
-            txtPresentValue.Text = Loan.LoanPresentValue != 0 ? txtPresentValue.Text = Loan.LoanPresentValue.ToString() : "";
-            btnSalePrice.Enabled = (Loan.MonthlyPayment > 0 && Loan.InterestRate > 0 && Loan.NumberPayments > 0);
-            btnInterest.Enabled = (Loan.LoanPresentValue > 0 && Loan.SalePrice > 0 && Loan.MonthlyPayment > 0 && Loan.NumberPayments > 0);
-            btnPayment.Enabled = (Loan.LoanPresentValue > 0 && Loan.SalePrice > 0 && Loan.InterestRate > 0 && Loan.NumberPayments > 0);
-            btnNumPayments.Enabled = (Loan.LoanPresentValue > 0 && Loan.SalePrice > 0 && Loan.MonthlyPayment > 0 && Loan.InterestRate > 0);
+            double result;
+            int intResult;
+            Loan.TradeIn = double.TryParse(txtTradeIn.Text, out result) ? result : 0;
+            Loan.AmountStillOwed = double.TryParse(txtAmountStillOwed.Text, out result) ? result : 0;
+            Loan.DownPayment = double.TryParse(txtDownPayment.Text, out result) ? result : 0;
+            Loan.CalculateCompensatingBalance();
+            Loan.SalePrice = double.TryParse(txtSalePrice.Text, out result) ? result : 0;
+            Loan.CalculateAmountFinanced();
+            Loan.NumberPayments = int.TryParse(txtNumberPayments.Text, out intResult) ? intResult : 0;
+            Loan.MonthlyPayment = double.TryParse(txtMonthlyPayment.Text, out result) ? result : 0;
+            Loan.InterestRate = double.TryParse(txtInterestRate.Text, out result) ? result : 0;
+            Loan.MonthlyPayment = double.TryParse(txtMonthlyPayment.Text, out result) ? result : 0;
+        }
+        private void RefreshControls()
+        {
+            UpdateLoan();
+            txtCompensatingBalance.Text = Loan.CompensatingBalance != 0 ? Loan.CompensatingBalance.ToString("N2") : "";
+            txtPresentValue.Text = Loan.LoanPresentValue != 0 ? txtPresentValue.Text = Loan.LoanPresentValue.ToString("N2") : "";
+            btnSalePrice.Enabled = Loan.MonthlyPayment > 0 && Loan.InterestRate > 0 && Loan.NumberPayments > 0;
+            btnInterest.Enabled = Loan.LoanPresentValue > 0 && Loan.SalePrice > 0 && Loan.MonthlyPayment > 0 && Loan.NumberPayments > 0;
+            btnPayment.Enabled = Loan.LoanPresentValue > 0 && Loan.SalePrice > 0 && Loan.InterestRate > 0 && Loan.NumberPayments > 0;
+            btnNumPayments.Enabled = Loan.LoanPresentValue > 0 && Loan.SalePrice > 0 && Loan.MonthlyPayment > 0 && Loan.InterestRate > 0;
             Loan.WhenDue = cbxDueAtMonthEnd.Checked ? DueDate.EndOfPeriod : DueDate.BegOfPeriod;
             Refresh();
         }
-        private void txtTradeIn_TextChanged(object sender, EventArgs e)
+        private void LeaveEventDecimal2(object sender, EventArgs e)
         {
-            Loan.TradeIn = validateTextbox(txtTradeIn);
-            Loan.CalculateCompensatingBalance();
-            Loan.CalculateAmountFinanced();
-            Loan.RoundValues();
-            refreshControls();
+            if (double.TryParse(((TextBox)sender).Text.Trim(), out double result))
+            {
+                ((TextBox)sender).Text = result.ToString("N2");
+                RefreshControls();
+            }
         }
-        private void txtAmountStillOwed_TextChanged(object sender, EventArgs e)
+        private void LeaveEventDecimal4(object sender, EventArgs e)
         {
-            Loan.AmountStillOwed = validateTextbox(txtAmountStillOwed);
-            Loan.CalculateCompensatingBalance();
-            Loan.CalculateAmountFinanced();
-            Loan.RoundValues();
-            refreshControls();
+            if (double.TryParse(((TextBox)sender).Text.Trim(), out double result))
+            {
+                ((TextBox)sender).Text = result.ToString("N4");
+                RefreshControls();
+            }
+        }
+        private void LeaveEventInteger(object sender, EventArgs e)
+        {
+            if (int.TryParse(((TextBox)sender).Text.Trim(), out int result))
+            {
+                ((TextBox)sender).Text = result.ToString();
+                RefreshControls();
+            }
+        }
+        private void KeyPressedDecimal(object sender, KeyPressEventArgs e)
+        {
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
+                e.Handled = true;
 
+            if ((e.KeyChar == '.') && ((TextBox)sender).Text.IndexOf('.') > -1)
+                e.Handled = true;
         }
-        private void txtDownPayment_TextChanged(object sender, EventArgs e)
+        private void KeyPressedInteger(object sender, KeyPressEventArgs e)
         {
-            Loan.DownPayment = validateTextbox(txtDownPayment);
-            Loan.CalculateCompensatingBalance();
-            Loan.CalculateAmountFinanced();
-            Loan.RoundValues();
-            refreshControls();
-        }
-        private void txtNumberPayments_TextChanged(object sender, EventArgs e)
-        {
-            Loan.NumberPayments = validateTextbox(txtNumberPayments);
-            refreshControls();
-        }
-        private void txtSalePrice_TextChanged(object sender, EventArgs e)
-        {
-            Loan.SalePrice = validateTextbox(txtSalePrice);
-            Loan.CalculateAmountFinanced();
-            Loan.RoundValues();
-            refreshControls();
-        }
-        private void txtMonthlyPayment_TextChanged(object sender, EventArgs e)
-        {
-            Loan.MonthlyPayment = validateTextbox(txtMonthlyPayment);
-            Loan.RoundValues();
-            refreshControls();
-        }
-        private void txtInterestRate_TextChanged(object sender, EventArgs e)
-        {
-            Loan.InterestRate = validateTextbox(txtInterestRate);
-            Loan.RoundValues();
-            refreshControls();
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
+                e.Handled = true;
         }
         private void btnSalePrice_Click(object sender, EventArgs e)
         {
             Loan.CalculateSalePrice();
-            Loan.RoundValues();
-            txtSalePrice.Text = Loan.SalePrice.ToString();  // Change in this value triggers a recalculation of Loan.loanPresentValue
-            txtPresentValue.Text = Loan.LoanPresentValue.ToString();
-            refreshControls();
+            txtSalePrice.Text = Loan.SalePrice.ToString("N2");
+            txtPresentValue.Text = Loan.LoanPresentValue.ToString("N2");
+            RefreshControls();
         }
         private void btnInterest_Click(object sender, EventArgs e)
         {
             Loan.WhenDue = cbxDueAtMonthEnd.Checked ? DueDate.EndOfPeriod : DueDate.BegOfPeriod;
             Loan.CalculateInterestRate();
-            txtInterestRate.Text = Loan.InterestRate.ToString();
-            refreshControls();
+            txtInterestRate.Text = Loan.InterestRate.ToString("N2");
+            RefreshControls();
         }
         private void btnPayment_Click(object sender, EventArgs e)
         {
             Loan.CalculateMonthlyPayment();
-            txtMonthlyPayment.Text = Loan.MonthlyPayment.ToString();
-            refreshControls();
+            txtMonthlyPayment.Text = Loan.MonthlyPayment.ToString("N2");
+            RefreshControls();
         }
         private void cbxDueAtMonthEnd_CheckedChanged(object sender, EventArgs e)
         {
@@ -100,18 +103,11 @@ namespace LoanCalculator
             if (btnInterest.Enabled && Loan.NumberPayments > 0)
             {
                 Loan.CalculateInterestRate();
-                txtInterestRate.Text = Loan.InterestRate.ToString();
+                txtInterestRate.Text = Loan.InterestRate.ToString("N2");
             }
-            refreshControls();
+            RefreshControls();
         }
-        private static double validateTextbox(TextBox textBoxToValidate)
-        {
-            double result = !double.TryParse(textBoxToValidate.Text, out result) ? (textBoxToValidate.Text.StartsWith("-") ? result : 0) : result;
-            //Console.WriteLine(textBoxToValidate.Name + " " + result.ToString());
-            textBoxToValidate.Text = result != 0 ? textBoxToValidate.Text = result.ToString() : textBoxToValidate.Text = "";
-            return result;
-        }
-        private void clearForm()
+        private void ClearForm()
         {
             txtCompensatingBalance.Text = "";
             txtDownPayment.Text = "";
@@ -123,13 +119,14 @@ namespace LoanCalculator
             txtTradeIn.Text = "";
             txtAmountStillOwed.Text = "";
             cbxDueAtMonthEnd.Checked = false;
+            Refresh();
         }
         private void btnNumPayments_Click(object sender, EventArgs e)
         {
             Loan.CalculateNumberPayments();
 
             txtNumberPayments.Text = Loan.NumberPayments.ToString();
-            refreshControls();
+            RefreshControls();
         }
         private void btnDone_Click(object sender, EventArgs e)
         {
@@ -138,7 +135,7 @@ namespace LoanCalculator
         private void btnClear_Click(object sender, EventArgs e)
         {
             Loan.ClearValues();
-            clearForm();
+            ClearForm();
         }
     }
 }
