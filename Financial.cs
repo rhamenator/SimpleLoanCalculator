@@ -1402,7 +1402,8 @@ namespace LoanCalculator
                     throw new ArgumentException(Utils.GetResourceString("Financial_CannotCalculateNPer"));
 
                 mTemp4 = Rate + 1.0m;
-                return (decimal)((Math.Log((double)mTempFv) - Math.Log((double)mTempPv)) / Math.Log((double)mTemp4));
+                return (Ln(mTempFv) - Ln(mTempPv)) / Ln(mTemp4);
+  //              return (decimal)((Math.Log((double)mTempFv) - Math.Log((double)mTempPv)) / Math.Log((double)mTemp4));
             }
         }
 
@@ -1418,9 +1419,9 @@ namespace LoanCalculator
         // As with the others, this function puts its status in *lpwStatus,
         // and returns the result as a decimal.
         // 
-        // Value1       Value2      Value3
+        //        Value1       Value2      Value3
         // npv = -------- + ---------- + ---------- + ... for the series...
-        // (1+rate)   (1+rate)^2   (1+rate)^3
+        //       (1+rate)   (1+rate)^2   (1+rate)^3
         // 
         // 
         // Returns    : decimal
