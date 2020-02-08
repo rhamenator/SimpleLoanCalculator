@@ -57,6 +57,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Financial.cs" />
     <Compile Include="Loan.cs" />
     <Compile Include="SimpleLoanCalculator.cs">
       <SubType>Form</SubType>
