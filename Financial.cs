@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
 
@@ -6,11 +7,50 @@ namespace LoanCalculator
 {
     public static class Financial
     {
+        private const double cnL_IT_STEP = 0.00001;
+        private const double cnL_IT_EPSILON = 0.0000001;
+        private const uint _LOOPS = 10;
+        
+        public static decimal Pow(decimal Base, uint Exponent)
+        {
+            if (Exponent == 1)
+                return Base;
+
+            decimal A = 1m;
+            BitArray e = new BitArray(BitConverter.GetBytes(Exponent));
+            int t = e.Count;
+
+            for (int i = t - 1; i >= 0; --i)
+            {
+                A *= A;
+                if (e[i] == true)
+                {
+                    A *= Base;
+                }
+            }
+            return A;
+        }
+        public static decimal Ln(decimal a)
+        {
+            //ln(a) = log(1-x) = - x - x^2/2 - x^3/3 - ...   (where |x| < 1)
+            //    x: a = 1-x    =>   x = 1-a = 1 - 1.004 = -.004
+
+            decimal x = 1 - a;
+            if (Math.Abs(x) >= 1)
+                throw new Exception("must be 0 < a < 2");
+
+            decimal result = 0;
+            uint iteration = _LOOPS;
+            while (iteration > 0)
+            {
+                result -= Pow(x, iteration) / iteration;
+                iteration--;
+            }
+            return result;
+        }
         // ============================================================================
         // Financial methods.
         // ============================================================================
-        private const double cnL_IT_STEP = 0.00001;
-        private const double cnL_IT_EPSILON = 0.0000001;
 
         // -------------------------------------------------------------
         // 
@@ -982,11 +1022,13 @@ namespace LoanCalculator
 
             // WARSI Using the exponent operator for pow(..) in C code of DDB. Still got
             // to make sure that they (pow and ^) are same for all conditions
-            mRet = Factor * Cost / Life * (decimal)Math.Pow((double)mTemp, (double)mNTemp);
+            mRet = Factor * Cost / Life * Pow(mTemp, (uint)mNTemp);
+            //            mRet = Factor * Cost / Life * (decimal)Math.Pow((double)mTemp, (double)mNTemp);
 
             // WARSI Using the exponent operator for pow(..) in C code of DDB. Still got
             // to make sure that they (pow and ^) are same for all conditions
-            mTot = Cost * (1 - (decimal)Math.Pow((double)mTemp, (double)Period));
+            mTot = Cost * (1 - Pow(mTemp, (uint)Period));
+//            mTot = Cost * (1 - (decimal)Math.Pow((double)mTemp, (double)Period));
             mExcess = mTot - Cost + Salvage;
 
             if (mExcess > 0.0m)
@@ -1038,7 +1080,8 @@ namespace LoanCalculator
                 mTemp = 1.0m;
 
             mTemp3 = 1.0m + Rate;
-            mTemp2 = (decimal)Math.Pow((double)mTemp3, (double)NPer);
+            mTemp2 = Pow(mTemp3, (uint)NPer);
+            //mTemp2 = (decimal)Math.Pow((double)mTemp3, (double)NPer);
 
             // Do divides before multiplies to avoid OverflowExceptions
             return ((-PV) * mTemp2) - ((Pmt / Rate) * mTemp * (mTemp2 - 1.0m));
@@ -1293,13 +1336,15 @@ namespace LoanCalculator
             mTemp1 = ReinvestRate + 1.0m;
             mNTemp2 = lCVal;
 
-            mTemp = -mNpvPos * (decimal)Math.Pow((double)mTemp1, (double)mNTemp2) / (mNpvNeg * (FinanceRate + 1.0m));
+            mTemp = -mNpvPos * Pow(mTemp1, (uint)mNTemp2) / (mNpvNeg * (FinanceRate + 1.0m));
+            //mTemp = -mNpvPos * (decimal)Math.Pow((double)mTemp1, (double)mNTemp2) / (mNpvNeg * (FinanceRate + 1.0m));
 
             if (mTemp < 0.0m)
                 throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue"));
 
             mTemp1 = 1 / (lCVal - 1.0m);
-            return (decimal)Math.Pow((double)mTemp, (double)mTemp1) - 1.0m;
+            return Pow(mTemp, (uint)mTemp1) - 1.0m;
+            //return (decimal)Math.Pow((double)mTemp, (double)mTemp1) - 1.0m;
         }
 
 
@@ -1472,7 +1517,8 @@ namespace LoanCalculator
                 mTemp3 = Rate + 1.0m;
                 // WARSI Using the exponent operator for pow(..) in C code of PMT. Still got
                 // to make sure that they (pow and ^) are same for all conditions
-                mTemp2 = (decimal)Math.Pow((double)mTemp3, (double)NPer);
+                mTemp2 = Pow(mTemp3, (uint)NPer);
+                //mTemp2 = (decimal)Math.Pow((double)mTemp3, (double)NPer);
                 return ((-FV - PV * mTemp2) / (mTemp * (mTemp2 - 1.0m)) * Rate);
             }
         }
@@ -1540,7 +1586,8 @@ namespace LoanCalculator
 
                 // WARSI Using the exponent operator for pow(..) in C code of PV. Still got
                 // to make sure that they (pow and ^) are same for all conditions
-                mTemp2 = (decimal)Math.Pow((double)mTemp3, (double)NPer);
+                mTemp2 = Pow(mTemp3, (uint)NPer);
+                //mTemp2 = (decimal)Math.Pow((double)mTemp3, (double)NPer);
 
                 // Do divides before multiplies to avoid OverFlowExceptions
                 return (-(FV + Pmt * mTemp * ((mTemp2 - 1.0m) / Rate)) / mTemp2);
@@ -1713,7 +1760,8 @@ namespace LoanCalculator
                 mTemp3 = Rate + 1.0m;
                 // WARSI Using the exponent operator for pow(..) in C code of LEvalRate. Still got
                 // to make sure that they (pow and ^) are same for all conditions
-                mTemp1 = (decimal)Math.Pow((double)mTemp3, (double)NPer);
+                mTemp1 = Pow(mTemp3, (uint)NPer);
+                //mTemp1 = (decimal)Math.Pow((double)mTemp3, (double)NPer);
 
                 if (Due != 0)
                     mTemp2 = 1 + Rate;
