@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Windows.Forms;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
 
@@ -9,26 +10,56 @@ namespace LoanCalculator
     {
         private const double cnL_IT_STEP = 0.00001;
         private const double cnL_IT_EPSILON = 0.0000001;
-        private const uint _LOOPS = 10;
-        
-        public static decimal Pow(decimal Base, uint Exponent)
+        private const int _LOOPS = 10;
+        private const int EXP_ITERATIONS = 27;
+
+        public static int Factorial(int n)
         {
-            if (Exponent == 1)
-                return Base;
-
-            decimal A = 1m;
-            BitArray e = new BitArray(BitConverter.GetBytes(Exponent));
-            int t = e.Count;
-
-            for (int i = t - 1; i >= 0; --i)
+            if (n == 1)
+                return 1;
+            else
+                return n * Factorial(n - 1);
+        }
+        public static decimal Exp(decimal x)
+        {
+            int iteration = EXP_ITERATIONS;
+            int factorial;
+            decimal result = 1;
+            for (int i = EXP_ITERATIONS; i > 0; i--)
             {
-                A *= A;
-                if (e[i] == true)
-                {
-                    A *= Base;
-                }
+                factorial = Factorial(iteration);
+                result += Pow(x, iteration) / factorial;
             }
-            return A;
+            return result;
+        }
+        public static decimal Pow(decimal Base, decimal Exponent)
+        {
+            return Exp(Exponent*Ln(Base));
+        }
+        public static decimal Pow(decimal Base, int Exponent)
+        {
+            if (Math.Abs(Exponent) == 1)
+                return Base;
+            else if (Exponent == 0)
+                return 1;
+            else if (Exponent < 0)
+                return 1 / Pow(Base, Math.Abs(Exponent));
+            else
+            {
+                decimal result = 1m;
+                BitArray e = new BitArray(BitConverter.GetBytes(Exponent));
+                int t = e.Count;
+
+                for (int i = t - 1; i >= 0; --i)
+                {
+                    result *= result;
+                    if (e[i] == true)
+                    {
+                        result *= Base;
+                    }
+                }
+                return result;
+            }
         }
         public static decimal Ln(decimal a)
         {
@@ -40,7 +71,7 @@ namespace LoanCalculator
                 throw new Exception("must be 0 < a < 2");
 
             decimal result = 0;
-            uint iteration = _LOOPS;
+            int iteration = _LOOPS;
             while (iteration > 0)
             {
                 result -= Pow(x, iteration) / iteration;
@@ -1022,12 +1053,12 @@ namespace LoanCalculator
 
             // WARSI Using the exponent operator for pow(..) in C code of DDB. Still got
             // to make sure that they (pow and ^) are same for all conditions
-            mRet = Factor * Cost / Life * Pow(mTemp, (uint)mNTemp);
+            mRet = Factor * Cost / Life * Pow(mTemp, (int)mNTemp);
             //            mRet = Factor * Cost / Life * (decimal)Math.Pow((double)mTemp, (double)mNTemp);
 
             // WARSI Using the exponent operator for pow(..) in C code of DDB. Still got
             // to make sure that they (pow and ^) are same for all conditions
-            mTot = Cost * (1 - Pow(mTemp, (uint)Period));
+            mTot = Cost * (1 - Pow(mTemp, (int)Period));
 //            mTot = Cost * (1 - (decimal)Math.Pow((double)mTemp, (double)Period));
             mExcess = mTot - Cost + Salvage;
 
@@ -1080,7 +1111,7 @@ namespace LoanCalculator
                 mTemp = 1.0m;
 
             mTemp3 = 1.0m + Rate;
-            mTemp2 = Pow(mTemp3, (uint)NPer);
+            mTemp2 = Pow(mTemp3, (int)NPer);
             //mTemp2 = (decimal)Math.Pow((double)mTemp3, (double)NPer);
 
             // Do divides before multiplies to avoid OverflowExceptions
@@ -1336,14 +1367,14 @@ namespace LoanCalculator
             mTemp1 = ReinvestRate + 1.0m;
             mNTemp2 = lCVal;
 
-            mTemp = -mNpvPos * Pow(mTemp1, (uint)mNTemp2) / (mNpvNeg * (FinanceRate + 1.0m));
+            mTemp = -mNpvPos * Pow(mTemp1, (int)mNTemp2) / (mNpvNeg * (FinanceRate + 1.0m));
             //mTemp = -mNpvPos * (decimal)Math.Pow((double)mTemp1, (double)mNTemp2) / (mNpvNeg * (FinanceRate + 1.0m));
 
             if (mTemp < 0.0m)
                 throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue"));
 
             mTemp1 = 1 / (lCVal - 1.0m);
-            return Pow(mTemp, (uint)mTemp1) - 1.0m;
+            return Pow(mTemp, (int)mTemp1) - 1.0m;
             //return (decimal)Math.Pow((double)mTemp, (double)mTemp1) - 1.0m;
         }
 
@@ -1518,7 +1549,7 @@ namespace LoanCalculator
                 mTemp3 = Rate + 1.0m;
                 // WARSI Using the exponent operator for pow(..) in C code of PMT. Still got
                 // to make sure that they (pow and ^) are same for all conditions
-                mTemp2 = Pow(mTemp3, (uint)NPer);
+                mTemp2 = Pow(mTemp3, (int)NPer);
                 //mTemp2 = (decimal)Math.Pow((double)mTemp3, (double)NPer);
                 return ((-FV - PV * mTemp2) / (mTemp * (mTemp2 - 1.0m)) * Rate);
             }
@@ -1587,7 +1618,7 @@ namespace LoanCalculator
 
                 // WARSI Using the exponent operator for pow(..) in C code of PV. Still got
                 // to make sure that they (pow and ^) are same for all conditions
-                mTemp2 = Pow(mTemp3, (uint)NPer);
+                mTemp2 = Pow(mTemp3, (int)NPer);
                 //mTemp2 = (decimal)Math.Pow((double)mTemp3, (double)NPer);
 
                 // Do divides before multiplies to avoid OverFlowExceptions
@@ -1761,7 +1792,7 @@ namespace LoanCalculator
                 mTemp3 = Rate + 1.0m;
                 // WARSI Using the exponent operator for pow(..) in C code of LEvalRate. Still got
                 // to make sure that they (pow and ^) are same for all conditions
-                mTemp1 = Pow(mTemp3, (uint)NPer);
+                mTemp1 = Pow(mTemp3, (int)NPer);
                 //mTemp1 = (decimal)Math.Pow((double)mTemp3, (double)NPer);
 
                 if (Due != 0)
