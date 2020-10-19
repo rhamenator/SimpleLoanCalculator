@@ -3,7 +3,7 @@ using Microsoft.VisualBasic;
 
 namespace LoanCalculator
 {
-    public class Loan
+    public static class Loan
     { 
         public static double CompensatingBalance { get; set; }
         public static double LoanPresentValue { get; set; }
@@ -88,18 +88,5 @@ namespace LoanCalculator
 
             NumberPayments = Math.Round(NumberPayments, 0);
         }
-
-        //public static void RoundValues()
-        //{
-        //    CompensatingBalance = Math.Round(CompensatingBalance, 2);
-        //    LoanPresentValue = Math.Round(LoanPresentValue, 2);
-        //    TradeIn = Math.Round(TradeIn, 2);
-        //    AmountStillOwed = Math.Round(AmountStillOwed, 2);
-        //    DownPayment = Math.Round(DownPayment, 2);
-        //    SalePrice = Math.Round(SalePrice, 2);
-        //    MonthlyPayment = Math.Round(MonthlyPayment, 2);
-        //    InterestRate = Math.Round(InterestRate, 6);
-        //    NumberPayments = Math.Round(NumberPayments, 0);
-        //}
     }
 }

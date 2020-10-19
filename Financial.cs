@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Windows.Forms;
 using Microsoft.VisualBasic;
 using Microsoft.VisualBasic.CompilerServices;
 
@@ -10,77 +9,9 @@ namespace LoanCalculator
     {
         private const double cnL_IT_STEP = 0.00001;
         private const double cnL_IT_EPSILON = 0.0000001;
-        private const int _LOOPS = 10;
-        private const int EXP_ITERATIONS = 27;
 
-        public static int Factorial(int n)
-        {
-            if (n == 1)
-                return 1;
-            else
-                return n * Factorial(n - 1);
-        }
-        public static decimal Exp(decimal x)
-        {
-            int iteration = EXP_ITERATIONS;
-            int factorial;
-            decimal result = 1;
-            for (int i = EXP_ITERATIONS; i > 0; i--)
-            {
-                factorial = Factorial(iteration);
-                result += Pow(x, iteration) / factorial;
-            }
-            return result;
-        }
-        public static decimal Pow(decimal Base, decimal Exponent)
-        {
-            return Exp(Exponent*Ln(Base));
-        }
-        public static decimal Pow(decimal Base, int Exponent)
-        {
-            if (Math.Abs(Exponent) == 1)
-                return Base;
-            else if (Exponent == 0)
-                return 1;
-            else if (Exponent < 0)
-                return 1 / Pow(Base, Math.Abs(Exponent));
-            else
-            {
-                decimal result = 1m;
-                BitArray e = new BitArray(BitConverter.GetBytes(Exponent));
-                int t = e.Count;
-
-                for (int i = t - 1; i >= 0; --i)
-                {
-                    result *= result;
-                    if (e[i] == true)
-                    {
-                        result *= Base;
-                    }
-                }
-                return result;
-            }
-        }
-        public static decimal Ln(decimal a)
-        {
-            //ln(a) = log(1-x) = - x - x^2/2 - x^3/3 - ...   (where |x| < 1)
-            //    x: a = 1-x    =>   x = 1-a = 1 - 1.004 = -.004
-
-            decimal x = 1 - a;
-            if (Math.Abs(x) >= 1)
-                throw new Exception("must be 0 < a < 2");
-
-            decimal result = 0;
-            int iteration = _LOOPS;
-            while (iteration > 0)
-            {
-                result -= Pow(x, iteration) / iteration;
-                iteration--;
-            }
-            return result;
-        }
         // ============================================================================
-        // Financial methods.
+        // Financial methods (Double).
         // ============================================================================
 
         // -------------------------------------------------------------
@@ -175,10 +106,10 @@ namespace LoanCalculator
         // Name                      : FV
         // Purpose                   : It is computed as -
         //                                                        (1+rate)^nper - 1
-        // fv = -pv * (1 + rate)^nper - PMT * (1 + rate * type) * -----------------
+        //  fv = -pv * (1 + rate)^nper - PMT * (1 + rate * type) * -----------------
         //                                                              rate
         // 
-        // fv = -pv - PMT * nper        : if rate == 0
+        //  fv = -pv - PMT * nper    : if rate == 0
         // 
         // 
         // Returns                   : Double
@@ -1053,17 +984,17 @@ namespace LoanCalculator
 
             // WARSI Using the exponent operator for pow(..) in C code of DDB. Still got
             // to make sure that they (pow and ^) are same for all conditions
-            mRet = Factor * Cost / Life * Pow(mTemp, (int)mNTemp);
+            mRet = Factor * Cost / Life * SimpleLoanCalculator.Math.Pow(mTemp, (int)mNTemp);
             //            mRet = Factor * Cost / Life * (decimal)Math.Pow((double)mTemp, (double)mNTemp);
 
             // WARSI Using the exponent operator for pow(..) in C code of DDB. Still got
             // to make sure that they (pow and ^) are same for all conditions
-            mTot = Cost * (1 - Pow(mTemp, (int)Period));
+            mTot = Cost * (1 - SimpleLoanCalculator.Math.Pow(mTemp, (int)Period));
 //            mTot = Cost * (1 - (decimal)Math.Pow((double)mTemp, (double)Period));
             mExcess = mTot - Cost + Salvage;
 
             if (mExcess > 0.0m)
-                mRet = mRet - mExcess;
+                mRet -= mExcess;
 
             if (mRet >= 0.0m)
                 return mRet;
@@ -1111,7 +1042,7 @@ namespace LoanCalculator
                 mTemp = 1.0m;
 
             mTemp3 = 1.0m + Rate;
-            mTemp2 = Pow(mTemp3, (int)NPer);
+            mTemp2 = SimpleLoanCalculator.Math.Pow(mTemp3, (int)NPer);
             //mTemp2 = (decimal)Math.Pow((double)mTemp3, (double)NPer);
 
             // Do divides before multiplies to avoid OverflowExceptions
@@ -1163,7 +1094,7 @@ namespace LoanCalculator
 
             // Calculate FV just before the period on which interest would be applied
             if (Due != DueDate.EndOfPeriod)
-                PV = PV + Pmt;
+                PV += Pmt;
 
             mTFv = FV_Internal(Rate, (Per - mTemp), Pmt, PV, DueDate.EndOfPeriod);
 
@@ -1280,9 +1211,9 @@ namespace LoanCalculator
                 if (mNpv1 == mNPv0)
                 {
                     if (mRate1 > mRate0)
-                        mRate0 = mRate0 - (decimal)cnL_IT_STEP;
+                        mRate0 -= (decimal)cnL_IT_STEP;
                     else
-                        mRate0 = mRate0 + (decimal)cnL_IT_STEP;
+                        mRate0 += (decimal)cnL_IT_STEP;
                     mNPv0 = OptPV2(ref ValueArray, mRate0);
                     if (mNpv1 == mNPv0)
                         throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue"));
@@ -1367,14 +1298,14 @@ namespace LoanCalculator
             mTemp1 = ReinvestRate + 1.0m;
             mNTemp2 = lCVal;
 
-            mTemp = -mNpvPos * Pow(mTemp1, (int)mNTemp2) / (mNpvNeg * (FinanceRate + 1.0m));
+            mTemp = -mNpvPos * SimpleLoanCalculator.Math.Pow(mTemp1, (int)mNTemp2) / (mNpvNeg * (FinanceRate + 1.0m));
             //mTemp = -mNpvPos * (decimal)Math.Pow((double)mTemp1, (double)mNTemp2) / (mNpvNeg * (FinanceRate + 1.0m));
 
             if (mTemp < 0.0m)
                 throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue"));
 
             mTemp1 = 1 / (lCVal - 1.0m);
-            return Pow(mTemp, (int)mTemp1) - 1.0m;
+            return SimpleLoanCalculator.Math.Pow(mTemp, (int)mTemp1) - 1.0m;
             //return (decimal)Math.Pow((double)mTemp, (double)mTemp1) - 1.0m;
         }
 
@@ -1433,7 +1364,7 @@ namespace LoanCalculator
                     throw new ArgumentException(Utils.GetResourceString("Financial_CannotCalculateNPer"));
 
                 mTemp4 = Rate + 1.0m;
-                return (Ln(mTempFv) - Ln(mTempPv)) / Ln(mTemp4);
+                return (SimpleLoanCalculator.Math.Ln(mTempFv) - SimpleLoanCalculator.Math.Ln(mTempPv)) / SimpleLoanCalculator.Math.Ln(mTemp4);
   //              return (decimal)((Math.Log((double)mTempFv) - Math.Log((double)mTempPv)) / Math.Log((double)mTemp4));
             }
         }
@@ -1549,7 +1480,7 @@ namespace LoanCalculator
                 mTemp3 = Rate + 1.0m;
                 // WARSI Using the exponent operator for pow(..) in C code of PMT. Still got
                 // to make sure that they (pow and ^) are same for all conditions
-                mTemp2 = Pow(mTemp3, (int)NPer);
+                mTemp2 = SimpleLoanCalculator.Math.Pow(mTemp3, (int)NPer);
                 //mTemp2 = (decimal)Math.Pow((double)mTemp3, (double)NPer);
                 return ((-FV - PV * mTemp2) / (mTemp * (mTemp2 - 1.0m)) * Rate);
             }
@@ -1618,7 +1549,7 @@ namespace LoanCalculator
 
                 // WARSI Using the exponent operator for pow(..) in C code of PV. Still got
                 // to make sure that they (pow and ^) are same for all conditions
-                mTemp2 = Pow(mTemp3, (int)NPer);
+                mTemp2 = SimpleLoanCalculator.Math.Pow(mTemp3, (int)NPer);
                 //mTemp2 = (decimal)Math.Pow((double)mTemp3, (double)NPer);
 
                 // Do divides before multiplies to avoid OverFlowExceptions
@@ -1683,9 +1614,9 @@ namespace LoanCalculator
                 if (mY1 == mY0)
                 {
                     if (mRate1 > mRate0)
-                        mRate0 = mRate0 - (decimal)cnL_IT_STEP;
+                        mRate0 -= (decimal)cnL_IT_STEP;
                     else
-                        mRate0 = mRate0 - (decimal)cnL_IT_STEP * (-1);
+                        mRate0 -= (decimal)cnL_IT_STEP * (-1);
                     mY0 = LEvalRate(mRate0, NPer, Pmt, PV, FV, Due);
                     if (mY1 == mY0)
                         throw new ArgumentException(Utils.GetResourceString("Financial_CalcDivByZero"));
@@ -1792,7 +1723,7 @@ namespace LoanCalculator
                 mTemp3 = Rate + 1.0m;
                 // WARSI Using the exponent operator for pow(..) in C code of LEvalRate. Still got
                 // to make sure that they (pow and ^) are same for all conditions
-                mTemp1 = Pow(mTemp3, (int)NPer);
+                mTemp1 = SimpleLoanCalculator.Math.Pow(mTemp3, (int)NPer);
                 //mTemp1 = (decimal)Math.Pow((double)mTemp3, (double)NPer);
 
                 if (Due != 0)
@@ -1851,10 +1782,10 @@ namespace LoanCalculator
             for (I = lLower; I <= lUpper; I++)
             {
                 mTVal = ValueArray[I];
-                mTemp2 = mTemp2 + mTemp2 * Rate;
+                mTemp2 += mTemp2 * Rate;
 
                 if (!((bSkipPos && mTVal > 0.0m) || (bSkipNeg && mTVal < 0.0m)))
-                    mTotal = mTotal + mTVal / mTemp2;
+                    mTotal += mTVal / mTemp2;
             }
 
             return mTotal;
@@ -1875,12 +1806,12 @@ namespace LoanCalculator
             decimal divRate = 1.0m + Guess;
 
             while (lLower <= lUpper && ValueArray[lLower] == 0.0m)
-                lLower = lLower + 1;
+                lLower += 1;
 
             for (lIndex = lUpper; lIndex >= lLower; lIndex += -1)
             {
-                mTotal = mTotal / divRate;
-                mTotal = mTotal + ValueArray[lIndex];
+                mTotal /= divRate;
+                mTotal += ValueArray[lIndex];
             }
             return mTotal;
         }

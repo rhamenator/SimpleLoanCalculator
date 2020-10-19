@@ -290,7 +290,6 @@
             this.txtPresentValue.Size = new System.Drawing.Size(92, 13);
             this.txtPresentValue.TabIndex = 66;
             this.txtPresentValue.TabStop = false;
-            this.txtPresentValue.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Control_KeyUp);
             // 
             // txtCompensatingBalance
             // 
@@ -301,6 +300,7 @@
             this.txtCompensatingBalance.ReadOnly = true;
             this.txtCompensatingBalance.Size = new System.Drawing.Size(92, 13);
             this.txtCompensatingBalance.TabIndex = 63;
+            this.txtCompensatingBalance.TabStop = false;
             this.txtCompensatingBalance.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Control_KeyUp);
             // 
             // frmLoanWorksheet
