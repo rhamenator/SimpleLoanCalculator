@@ -146,7 +146,6 @@
             this.txtTradeIn.Size = new System.Drawing.Size(92, 20);
             this.txtTradeIn.TabIndex = 46;
             this.txtTradeIn.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.KeyPressedDecimal);
-            this.txtTradeIn.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Control_KeyUp);
             this.txtTradeIn.Leave += new System.EventHandler(this.LeaveEventDecimal2);
             // 
             // txtAmountStillOwed
@@ -156,7 +155,6 @@
             this.txtAmountStillOwed.Size = new System.Drawing.Size(92, 20);
             this.txtAmountStillOwed.TabIndex = 47;
             this.txtAmountStillOwed.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.KeyPressedDecimal);
-            this.txtAmountStillOwed.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Control_KeyUp);
             this.txtAmountStillOwed.Leave += new System.EventHandler(this.LeaveEventDecimal2);
             // 
             // txtDownPayment
@@ -166,7 +164,6 @@
             this.txtDownPayment.Size = new System.Drawing.Size(92, 20);
             this.txtDownPayment.TabIndex = 48;
             this.txtDownPayment.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.KeyPressedDecimal);
-            this.txtDownPayment.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Control_KeyUp);
             this.txtDownPayment.Leave += new System.EventHandler(this.LeaveEventDecimal2);
             // 
             // txtSalePrice
@@ -176,7 +173,6 @@
             this.txtSalePrice.Size = new System.Drawing.Size(92, 20);
             this.txtSalePrice.TabIndex = 49;
             this.txtSalePrice.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.KeyPressedDecimal);
-            this.txtSalePrice.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Control_KeyUp);
             this.txtSalePrice.Leave += new System.EventHandler(this.LeaveEventDecimal2);
             // 
             // btnSalePrice
@@ -196,7 +192,6 @@
             this.txtNumberPayments.Size = new System.Drawing.Size(92, 20);
             this.txtNumberPayments.TabIndex = 51;
             this.txtNumberPayments.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.KeyPressedInteger);
-            this.txtNumberPayments.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Control_KeyUp);
             this.txtNumberPayments.Leave += new System.EventHandler(this.LeaveEventInteger);
             // 
             // btnNumPayments
@@ -216,7 +211,6 @@
             this.txtInterestRate.Size = new System.Drawing.Size(92, 20);
             this.txtInterestRate.TabIndex = 53;
             this.txtInterestRate.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.KeyPressedDecimal);
-            this.txtInterestRate.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Control_KeyUp);
             this.txtInterestRate.Leave += new System.EventHandler(this.LeaveEventDecimal4);
             // 
             // btnInterest
@@ -236,7 +230,6 @@
             this.txtMonthlyPayment.Size = new System.Drawing.Size(92, 20);
             this.txtMonthlyPayment.TabIndex = 55;
             this.txtMonthlyPayment.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.KeyPressedDecimal);
-            this.txtMonthlyPayment.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Control_KeyUp);
             this.txtMonthlyPayment.Leave += new System.EventHandler(this.LeaveEventDecimal2);
             // 
             // cbxDueAtMonthEnd
@@ -249,7 +242,6 @@
             this.cbxDueAtMonthEnd.Text = "Due at Month End";
             this.cbxDueAtMonthEnd.UseVisualStyleBackColor = true;
             this.cbxDueAtMonthEnd.CheckedChanged += new System.EventHandler(this.cbxDueAtMonthEnd_CheckedChanged);
-            this.cbxDueAtMonthEnd.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Control_KeyUp);
             // 
             // btnPayment
             // 
@@ -301,7 +293,6 @@
             this.txtCompensatingBalance.Size = new System.Drawing.Size(92, 13);
             this.txtCompensatingBalance.TabIndex = 63;
             this.txtCompensatingBalance.TabStop = false;
-            this.txtCompensatingBalance.KeyUp += new System.Windows.Forms.KeyEventHandler(this.Control_KeyUp);
             // 
             // frmLoanWorksheet
             // 

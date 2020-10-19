@@ -74,24 +74,20 @@ namespace LoanCalculator
             if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar) && (e.KeyChar != '.'))
                 e.Handled = true;
         }
-        private void Control_KeyUp(object sender, KeyEventArgs e)
-        {
-            Debug.Print("This control is a(n) " + sender.GetType().ToString());
-            if ((e.KeyCode == Keys.Enter) || (e.KeyCode == Keys.Return) || (e.KeyCode == Keys.Down))
-            {
-                this.SelectNextControl((Control)sender, true, true, true, true);
-                //while (!this.ActiveControl.TabStop)
-                //    this.SelectNextControl(this.ActiveControl, true, true, true, true);
-                e.Handled = true;
-            }
-            if (e.KeyCode == Keys.Up)
-            {
-                this.SelectNextControl((Control)sender, false, true, true, true);
-                //while (!this.ActiveControl.TabStop)
-                //    this.SelectNextControl(this.ActiveControl, false, true, true, true);
-                e.Handled = true;
-            }
-        }
+        //private void Control_KeyUp(object sender, KeyEventArgs e)
+        //{
+        //    Debug.Print("This control is a " + sender.ToString() + " Key Pressed:" + e.KeyCode.ToString());
+        //    if ((e.KeyCode == Keys.Enter) || (e.KeyCode == Keys.Return) || (e.KeyCode == Keys.Down))
+        //    {
+        //        this.SelectNextControl((Control)sender, true, true, true, true);
+        //        e.Handled = true;
+        //    }
+        //    if (e.KeyCode == Keys.Up)
+        //    {
+        //        this.SelectNextControl((Control)sender, false, true, true, true);
+        //        e.Handled = true;
+        //    }
+        //}
         private void btnSalePrice_Click(object sender, EventArgs e)
         {
             Loan.CalculateSalePrice();
