@@ -6,7 +6,7 @@ namespace LoanCalculator
     public static class Loan
     { 
         public static double CompensatingBalance { get; set; }
-        public static double LoanPresentValue { get; set; }
+        public static double AmountFinanced { get; set; }
         public static double TradeIn { get; set; }
         public static double AmountStillOwed { get; set; }
         public static double DownPayment { get; set; }
@@ -19,7 +19,7 @@ namespace LoanCalculator
         public static void ClearValues()
         {
             CompensatingBalance = 0;
-            LoanPresentValue = 0;
+            AmountFinanced = 0;
             TradeIn = 0;
             AmountStillOwed = 0;
             DownPayment = 0;
@@ -40,33 +40,33 @@ namespace LoanCalculator
         }
         public static void CalculateAmountFinanced()
         {
-            LoanPresentValue = SalePrice - CompensatingBalance;
+            AmountFinanced = SalePrice - CompensatingBalance;
             //Console.WriteLine("CalculateAmountFinanced:");
             //Console.WriteLine("SalePrice = " + SalePrice.ToString());
             //Console.WriteLine("CompensatingBalance = " + CompensatingBalance.ToString());
-            //Console.WriteLine("LoanPresentValue = " + LoanPresentValue.ToString());
+            //Console.WriteLine("AmountFinanced = " + AmountFinanced.ToString());
         }
 
         public static void CalculateSalePrice()
         {
-            LoanPresentValue
+            AmountFinanced
                 = Financial.PV(InterestRate / 1200, NumberPayments,
                     -MonthlyPayment, 0, WhenDue);
 
             CompensatingBalance = Math.Round(CompensatingBalance, 2);
-            LoanPresentValue = Math.Round(LoanPresentValue, 2);
+            AmountFinanced = Math.Round(AmountFinanced, 2);
             TradeIn = Math.Round(TradeIn, 2);
             AmountStillOwed = Math.Round(AmountStillOwed, 2);
             DownPayment = Math.Round(DownPayment, 2);
 
-            SalePrice = LoanPresentValue + CompensatingBalance;
+            SalePrice = AmountFinanced + CompensatingBalance;
         }
 
         public static void CalculateInterestRate()
         {
             InterestRate
                 = Math.Abs(Financial.Rate(NumberPayments, -MonthlyPayment,
-                    LoanPresentValue, 0, WhenDue, 0.1) * 1200);
+                    AmountFinanced, 0, WhenDue, 0.1) * 1200);
 
             InterestRate = Math.Round(InterestRate, 6);
         }
@@ -75,7 +75,7 @@ namespace LoanCalculator
         {
             MonthlyPayment
                 = Math.Abs(Financial.Pmt(InterestRate / 1200, NumberPayments,
-                    LoanPresentValue, 0, WhenDue));
+                    AmountFinanced, 0, WhenDue));
 
             MonthlyPayment = Math.Round(MonthlyPayment, 2);
         }
@@ -84,7 +84,7 @@ namespace LoanCalculator
         {
             NumberPayments
                 = Financial.NPer(InterestRate / 1200, -MonthlyPayment,
-                    LoanPresentValue, 0, WhenDue);
+                    AmountFinanced, 0, WhenDue);
 
             NumberPayments = Math.Round(NumberPayments, 0);
         }

@@ -30,11 +30,11 @@ namespace LoanCalculator
         {
             UpdateLoan();
             txtCompensatingBalance.Text = Loan.CompensatingBalance != 0 ? Loan.CompensatingBalance.ToString("N2") : "";
-            txtPresentValue.Text = Loan.LoanPresentValue != 0 ? txtPresentValue.Text = Loan.LoanPresentValue.ToString("N2") : "";
+            txtAmountFinanced.Text = Loan.AmountFinanced != 0 ? txtAmountFinanced.Text = Loan.AmountFinanced.ToString("N2") : "";
             btnSalePrice.Enabled = Loan.MonthlyPayment > 0 && Loan.InterestRate > 0 && Loan.NumberPayments > 0;
-            btnInterest.Enabled = Loan.LoanPresentValue > 0 && Loan.SalePrice > 0 && Loan.MonthlyPayment > 0 && Loan.NumberPayments > 0;
-            btnPayment.Enabled = Loan.LoanPresentValue > 0 && Loan.SalePrice > 0 && Loan.InterestRate > 0 && Loan.NumberPayments > 0;
-            btnNumPayments.Enabled = Loan.LoanPresentValue > 0 && Loan.SalePrice > 0 && Loan.MonthlyPayment > 0 && Loan.InterestRate > 0;
+            btnInterest.Enabled = Loan.AmountFinanced > 0 && Loan.SalePrice > 0 && Loan.MonthlyPayment > 0 && Loan.NumberPayments > 0;
+            btnPayment.Enabled = Loan.AmountFinanced > 0 && Loan.SalePrice > 0 && Loan.InterestRate > 0 && Loan.NumberPayments > 0;
+            btnNumPayments.Enabled = Loan.AmountFinanced > 0 && Loan.SalePrice > 0 && Loan.MonthlyPayment > 0 && Loan.InterestRate > 0;
             Loan.WhenDue = cbxDueAtMonthEnd.Checked ? DueDate.EndOfPeriod : DueDate.BegOfPeriod;
             Refresh();
         }
@@ -92,7 +92,7 @@ namespace LoanCalculator
         {
             Loan.CalculateSalePrice();
             txtSalePrice.Text = Loan.SalePrice.ToString("N2");
-            txtPresentValue.Text = Loan.LoanPresentValue.ToString("N2");
+            txtAmountFinanced.Text = Loan.AmountFinanced.ToString("N2");
             RefreshControls();
         }
         private void btnInterest_Click(object sender, EventArgs e)
@@ -125,7 +125,7 @@ namespace LoanCalculator
             txtInterestRate.Text = "";
             txtMonthlyPayment.Text = "";
             txtNumberPayments.Text = "";
-            txtPresentValue.Text = "";
+            txtAmountFinanced.Text = "";
             txtSalePrice.Text = "";
             txtTradeIn.Text = "";
             txtAmountStillOwed.Text = "";

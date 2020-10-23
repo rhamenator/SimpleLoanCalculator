@@ -51,7 +51,7 @@
             this.btnPayment = new System.Windows.Forms.Button();
             this.btnClear = new System.Windows.Forms.Button();
             this.btnDone = new System.Windows.Forms.Button();
-            this.txtPresentValue = new System.Windows.Forms.TextBox();
+            this.txtAmountFinanced = new System.Windows.Forms.TextBox();
             this.txtCompensatingBalance = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
@@ -273,15 +273,15 @@
             this.btnDone.UseVisualStyleBackColor = true;
             this.btnDone.Click += new System.EventHandler(this.btnDone_Click);
             // 
-            // txtPresentValue
+            // txtAmountFinanced
             // 
-            this.txtPresentValue.BorderStyle = System.Windows.Forms.BorderStyle.None;
-            this.txtPresentValue.Location = new System.Drawing.Point(130, 143);
-            this.txtPresentValue.Name = "txtPresentValue";
-            this.txtPresentValue.ReadOnly = true;
-            this.txtPresentValue.Size = new System.Drawing.Size(92, 13);
-            this.txtPresentValue.TabIndex = 66;
-            this.txtPresentValue.TabStop = false;
+            this.txtAmountFinanced.BorderStyle = System.Windows.Forms.BorderStyle.None;
+            this.txtAmountFinanced.Location = new System.Drawing.Point(130, 143);
+            this.txtAmountFinanced.Name = "txtAmountFinanced";
+            this.txtAmountFinanced.ReadOnly = true;
+            this.txtAmountFinanced.Size = new System.Drawing.Size(92, 13);
+            this.txtAmountFinanced.TabIndex = 66;
+            this.txtAmountFinanced.TabStop = false;
             // 
             // txtCompensatingBalance
             // 
@@ -303,7 +303,7 @@
             this.Controls.Add(this.lblMonthlyPayment);
             this.Controls.Add(this.lblNumPayments);
             this.Controls.Add(this.lblInterestRate);
-            this.Controls.Add(this.txtPresentValue);
+            this.Controls.Add(this.txtAmountFinanced);
             this.Controls.Add(this.lblSalePrice);
             this.Controls.Add(this.lblCompensatingBalance);
             this.Controls.Add(this.lblLoanPresentValue);
@@ -357,7 +357,7 @@
         private System.Windows.Forms.Button btnPayment;
         private System.Windows.Forms.Button btnClear;
         private System.Windows.Forms.Button btnDone;
-        private System.Windows.Forms.TextBox txtPresentValue;
+        private System.Windows.Forms.TextBox txtAmountFinanced;
         private System.Windows.Forms.TextBox txtCompensatingBalance;
     }
 }
