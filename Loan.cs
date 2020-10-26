@@ -6,15 +6,15 @@ namespace SimpleLoanCalculator
 {
     public static class Loan
     { 
-        public static double CompensatingBalance { get; set; }
-        public static double AmountFinanced { get; set; }
-        public static double TradeIn { get; set; }
-        public static double AmountStillOwed { get; set; }
-        public static double DownPayment { get; set; }
-        public static double SalePrice { get; set; }
-        public static double MonthlyPayment { get; set; }
-        public static double InterestRate { get; set; }
-        public static double NumberPayments { get; set; }
+        public static decimal CompensatingBalance { get; set; }
+        public static decimal AmountFinanced { get; set; }
+        public static decimal TradeIn { get; set; }
+        public static decimal AmountStillOwed { get; set; }
+        public static decimal DownPayment { get; set; }
+        public static decimal SalePrice { get; set; }
+        public static decimal MonthlyPayment { get; set; }
+        public static decimal InterestRate { get; set; }
+        public static decimal NumberPayments { get; set; }
         public static DueDate WhenDue { get; set; }
 
         public static void ClearValues()
@@ -67,9 +67,9 @@ namespace SimpleLoanCalculator
         {
             InterestRate
                 = System.Math.Abs(Financial.Rate(NumberPayments, -MonthlyPayment,
-                    AmountFinanced, 0, WhenDue, 0.1) * 1200);
+                    AmountFinanced, 0, WhenDue, 0.1m) * 1200);
 
-            InterestRate = System.Math.Round(InterestRate, 6);
+            InterestRate = System.Math.Round(InterestRate, 4);
         }
 
         public static void CalculateMonthlyPayment()

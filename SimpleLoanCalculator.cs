@@ -16,16 +16,16 @@ namespace SimpleLoanCalculator
         }
         private void UpdateLoan()
         {
-            Loan.TradeIn = double.TryParse(txtTradeIn.Text, out double result) ? result : 0;
-            Loan.AmountStillOwed = double.TryParse(txtAmountStillOwed.Text, out result) ? result : 0;
-            Loan.DownPayment = double.TryParse(txtDownPayment.Text, out result) ? result : 0;
+            Loan.TradeIn = decimal.TryParse(txtTradeIn.Text, out decimal result) ? result : 0;
+            Loan.AmountStillOwed = decimal.TryParse(txtAmountStillOwed.Text, out result) ? result : 0;
+            Loan.DownPayment = decimal.TryParse(txtDownPayment.Text, out result) ? result : 0;
             Loan.CalculateCompensatingBalance();
-            Loan.SalePrice = double.TryParse(txtSalePrice.Text, out result) ? result : 0;
+            Loan.SalePrice = decimal.TryParse(txtSalePrice.Text, out result) ? result : 0;
             Loan.CalculateAmountFinanced();
             Loan.NumberPayments = int.TryParse(txtNumberPayments.Text, out int intResult) ? intResult : 0;
-            Loan.MonthlyPayment = double.TryParse(txtMonthlyPayment.Text, out result) ? result : 0;
-            Loan.InterestRate = double.TryParse(txtInterestRate.Text, out result) ? result : 0;
-            Loan.MonthlyPayment = double.TryParse(txtMonthlyPayment.Text, out result) ? result : 0;
+            Loan.MonthlyPayment = decimal.TryParse(txtMonthlyPayment.Text, out result) ? result : 0;
+            Loan.InterestRate = decimal.TryParse(txtInterestRate.Text, out result) ? result : 0;
+            Loan.MonthlyPayment = decimal.TryParse(txtMonthlyPayment.Text, out result) ? result : 0;
         }
         private void RefreshControls()
         {
@@ -41,7 +41,7 @@ namespace SimpleLoanCalculator
         }
         private void LeaveEventDecimal2(object sender, EventArgs e)
         {
-            if (double.TryParse(((TextBox)sender).Text.Trim(), out double result))
+            if (decimal.TryParse(((TextBox)sender).Text.Trim(), out decimal result))
             {
                 ((TextBox)sender).Text = result.ToString("N2");
                 RefreshControls();
@@ -49,7 +49,7 @@ namespace SimpleLoanCalculator
         }
         private void LeaveEventDecimal4(object sender, EventArgs e)
         {
-            if (double.TryParse(((TextBox)sender).Text.Trim(), out double result))
+            if (decimal.TryParse(((TextBox)sender).Text.Trim(), out decimal result))
             {
                 ((TextBox)sender).Text = result.ToString("N4");
                 RefreshControls();
