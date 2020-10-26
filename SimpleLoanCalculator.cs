@@ -1,8 +1,9 @@
 ﻿using System;
-using System.Diagnostics;
+using static SimpleLoanCalculator.Financial;
+//using System.Diagnostics;
 using System.Windows.Forms;
-using Microsoft.VisualBasic;
-namespace LoanCalculator
+//using Microsoft.VisualBasic;
+namespace SimpleLoanCalculator
 {
     public partial class frmLoanWorksheet : Form
     {
@@ -88,27 +89,35 @@ namespace LoanCalculator
         //        e.Handled = true;
         //    }
         //}
+#pragma warning disable IDE1006 // Naming Styles
         private void btnSalePrice_Click(object sender, EventArgs e)
+#pragma warning restore IDE1006 // Naming Styles
         {
             Loan.CalculateSalePrice();
             txtSalePrice.Text = Loan.SalePrice.ToString("N2");
             txtAmountFinanced.Text = Loan.AmountFinanced.ToString("N2");
             RefreshControls();
         }
+#pragma warning disable IDE1006 // Naming Styles
         private void btnInterest_Click(object sender, EventArgs e)
+#pragma warning restore IDE1006 // Naming Styles
         {
             Loan.WhenDue = cbxDueAtMonthEnd.Checked ? DueDate.EndOfPeriod : DueDate.BegOfPeriod;
             Loan.CalculateInterestRate();
             txtInterestRate.Text = Loan.InterestRate.ToString("N4");
             RefreshControls();
         }
+#pragma warning disable IDE1006 // Naming Styles
         private void btnPayment_Click(object sender, EventArgs e)
+#pragma warning restore IDE1006 // Naming Styles
         {
             Loan.CalculateMonthlyPayment();
             txtMonthlyPayment.Text = Loan.MonthlyPayment.ToString("N2");
             RefreshControls();
         }
+#pragma warning disable IDE1006 // Naming Styles
         private void cbxDueAtMonthEnd_CheckedChanged(object sender, EventArgs e)
+#pragma warning restore IDE1006 // Naming Styles
         {
             Loan.WhenDue = cbxDueAtMonthEnd.Checked ? DueDate.EndOfPeriod : DueDate.BegOfPeriod;
             if (btnInterest.Enabled && Loan.NumberPayments > 0)
@@ -132,18 +141,24 @@ namespace LoanCalculator
             cbxDueAtMonthEnd.Checked = false;
             Refresh();
         }
+#pragma warning disable IDE1006 // Naming Styles
         private void btnNumPayments_Click(object sender, EventArgs e)
+#pragma warning restore IDE1006 // Naming Styles
         {
             Loan.CalculateNumberPayments();
 
             txtNumberPayments.Text = Loan.NumberPayments.ToString();
             RefreshControls();
         }
+#pragma warning disable IDE1006 // Naming Styles
         private void btnDone_Click(object sender, EventArgs e)
+#pragma warning restore IDE1006 // Naming Styles
         {
             Close();
         }
+#pragma warning disable IDE1006 // Naming Styles
         private void btnClear_Click(object sender, EventArgs e)
+#pragma warning restore IDE1006 // Naming Styles
         {
             Loan.ClearValues();
             ClearForm();

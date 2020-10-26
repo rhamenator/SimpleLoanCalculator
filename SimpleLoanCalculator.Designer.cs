@@ -1,4 +1,4 @@
-﻿namespace LoanCalculator
+﻿namespace SimpleLoanCalculator
 {
     partial class frmLoanWorksheet
     {

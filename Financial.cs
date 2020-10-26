@@ -1,12 +1,14 @@
 ﻿using System;
-using System.Collections;
-using Microsoft.VisualBasic;
-using Microsoft.VisualBasic.CompilerServices;
 
-namespace LoanCalculator
+namespace SimpleLoanCalculator
 {
     public static class Financial
     {
+        public enum DueDate
+        {
+            EndOfPeriod = 0,
+            BegOfPeriod = 1
+        }
         private const double cnL_IT_STEP = 0.00001;
         private const double cnL_IT_EPSILON = 0.0000001;
 
@@ -51,8 +53,14 @@ namespace LoanCalculator
             double dNTemp;
 
             // Handle invalid parameters
-            if (Factor <= 0.0d || Salvage < 0.0d || Period <= 0.0d || Period > Life)
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "Factor"));
+            if (Factor <= 0.0d)
+                throw new ArgumentOutOfRangeException("Factor", Factor, "Factor must be greater than zero.");
+            if (Salvage < 0.0d)
+                throw new ArgumentOutOfRangeException("Salvage", Salvage, "Salvage must be greater than zero.");
+            if (Period <= 0.0d)
+                throw new ArgumentOutOfRangeException("Period", Period, "Period must be greater than zero.");
+            if (Period > Life)
+                throw new ArgumentOutOfRangeException("Period", Period, "Period must be less than or equal to Life = " + (Life).ToString() + ".");
 
             // Handle special (trivial) cases
             if (Cost <= 0.0d)
@@ -83,11 +91,11 @@ namespace LoanCalculator
 
             // WARSI Using the exponent operator for pow(..) in C code of DDB. Still got
             // to make sure that they (pow and ^) are same for all conditions
-            dRet = Factor * Cost / Life * Math.Pow(dTemp, dNTemp);
+            dRet = Factor * Cost / Life * System.Math.Pow(dTemp, dNTemp);
 
             // WARSI Using the exponent operator for pow(..) in C code of DDB. Still got
             // to make sure that they (pow and ^) are same for all conditions
-            dTot = Cost * (1 - Math.Pow(dTemp, Period));
+            dTot = Cost * (1 - System.Math.Pow(dTemp, Period));
             dExcess = dTot - Cost + Salvage;
 
             if (dExcess > 0.0d)
@@ -139,7 +147,7 @@ namespace LoanCalculator
                 dTemp = 1.0d;
 
             dTemp3 = 1.0d + Rate;
-            dTemp2 = Math.Pow(dTemp3, NPer);
+            dTemp2 = System.Math.Pow(dTemp3, NPer);
 
             // Do divides before multiplies to avoid OverflowExceptions
             return ((-PV) * dTemp2) - ((Pmt / Rate) * dTemp * (dTemp2 - 1.0d));
@@ -179,8 +187,10 @@ namespace LoanCalculator
                 dTemp = 1.0d;
 
             // Type = 0 or non-zero only. Offset to calculate FV
-            if ((Per <= 0.0d) || (Per >= NPer + 1))
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "Per"));
+            if (Per <= 0.0d)
+                throw new ArgumentOutOfRangeException("Per", Per, "Per must be greater than zero.");
+            if (Per >= NPer + 1)
+                throw new ArgumentOutOfRangeException("Per", Per, "Per must be less than " + (NPer + 1).ToString() + ".");
 
             if ((Due != DueDate.EndOfPeriod) && (Per == 1.0d))
                 return 0.0d;
@@ -255,19 +265,19 @@ namespace LoanCalculator
             {
                 throw ex;
             }
-            catch
+            catch (Exception ex)
             {
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "ValueArray"));
+                throw ex;
             }
 
             lCVal = lUpper + 1;
 
             // Function fails for invalid parameters
             if (Guess <= (-1.0d))
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "Guess"));
+                throw new ArgumentOutOfRangeException("Guess", Guess, "Guess must be greater than -1.0.");
 
             if (lCVal <= 1)
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "ValueArray"));
+                throw new ArgumentOutOfRangeException("ValueArray", Guess, "ValueArray size must be greater than 0.");
 
             // We scale the epsilon depending on cash flow values. It is necessary
             // because even in max accuracy case where diff is in 16th digit it
@@ -298,7 +308,7 @@ namespace LoanCalculator
                 dRate1 = dRate0 - cnL_IT_STEP;
 
             if (dRate1 <= (-1.0d))
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "Rate"));
+                throw new ArgumentOutOfRangeException("dRate1", dRate1, "Rate must be greater than -1.0.");
 
             dNpv1 = OptPV2(ref ValueArray, dRate1);
 
@@ -312,7 +322,7 @@ namespace LoanCalculator
                         dRate0 += cnL_IT_STEP;
                     dNPv0 = OptPV2(ref ValueArray, dRate0);
                     if (dNpv1 == dNPv0)
-                        throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue"));
+                        throw new ArgumentOutOfRangeException("dNpv1", dNpv1, "dNpv1 must not be equal to dNpv0.");
                 }
 
                 dRate0 = dRate1 - (dRate1 - dRate0) * dNpv1 / (dNpv1 - dNPv0);
@@ -347,10 +357,8 @@ namespace LoanCalculator
                 dRate1 = dTemp;
             }
 
-            throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue"));
+            throw new ArgumentOutOfRangeException("dRate0", dRate0, "dRate0 must be between " + dNpvEpsilon.ToString() + " and " + cnL_IT_EPSILON.ToString() + ".");
         }
-
-
 
         // -------------------------------------------------------------
         // 
@@ -371,37 +379,37 @@ namespace LoanCalculator
             int lUpper;
 
             if (ValueArray.Rank != 1)
-                throw new ArgumentException(Utils.GetResourceString("Argument_RankEQOne1", "ValueArray"));
+                throw new ArgumentOutOfRangeException("ValueArray.Rank", ValueArray.Rank, "ValueArray rank must be 1.");
 
             lLower = 0;
             lUpper = ValueArray.GetUpperBound(0);
             lCVal = lUpper - lLower + 1;
 
             if (FinanceRate == -1.0d)
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "FinanceRate"));
+                throw new ArgumentOutOfRangeException("FinanceRate", FinanceRate, "FinanceRate must not be equal to -1");
 
             if (ReinvestRate == -1.0d)
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "ReinvestRate"));
+                throw new ArgumentOutOfRangeException("ReinvestRate", ReinvestRate, "ReinvestRate must not be equal to -1");
 
             if (lCVal <= 1)
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "ValueArray"));
+                throw new ArgumentOutOfRangeException("ValueArray", null, "ValueArray must have at least one element.");
 
             dNpvNeg = LDoNPV(FinanceRate, ref ValueArray, -1);
             if (dNpvNeg == 0.0d)
-                throw new DivideByZeroException(Utils.GetResourceString("Financial_CalcDivByZero"));
+                throw new DivideByZeroException("MIRR cannot be calculated.");
 
             dNpvPos = LDoNPV(ReinvestRate, ref ValueArray, 1); // npv of +ve values
             dTemp1 = ReinvestRate + 1.0d;
             dNTemp2 = lCVal;
 
-            dTemp = -dNpvPos * Math.Pow(dTemp1, dNTemp2) / (dNpvNeg * (FinanceRate + 1.0d));
+            dTemp = -dNpvPos * System.Math.Pow(dTemp1, dNTemp2) / (dNpvNeg * (FinanceRate + 1.0d));
 
             if (dTemp < 0.0d)
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue"));
+                throw new ArgumentOutOfRangeException("MIRR cannot be calculated.");
 
             dTemp1 = 1 / (lCVal - 1.0d);
 
-            return Math.Pow(dTemp, dTemp1) - 1.0d;
+            return System.Math.Pow(dTemp, dTemp1) - 1.0d;
         }
 
 
@@ -411,13 +419,13 @@ namespace LoanCalculator
         // Name                      : NPer
         // Purpose                   :
         // 
-        // -fv + PMT*(1+rate*type) / rate
+        //                 -fv + PMT*(1+rate*type) / rate
         // (1+rate)^nper = ------------------------------
-        // pv + PMT*(1+rate*type) / rate
+        //                  pv + PMT*(1+rate*type) / rate
         // 
         // this yields the log expression used in this function.
         // 
-        // nper = (-fv - pv) / PMT     : if rate == 0
+        //          nper = (-fv - pv) / PMT     : if rate == 0
         // 
         // Returns                   : Double
         // 
@@ -432,12 +440,12 @@ namespace LoanCalculator
 
             // Checking Error Conditions
             if (Rate <= -1.0d)
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "Rate"));
+                throw new ArgumentOutOfRangeException("Rate");
 
             if (Rate == 0.0d)
             {
                 if (Pmt == 0.0d)
-                    throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "Pmt"));
+                    throw new ArgumentOutOfRangeException("Pmt");
                 return (-(PV + FV) / Pmt);
             }
             else
@@ -456,10 +464,10 @@ namespace LoanCalculator
                     dTempPv = -1 * dTempPv;
                 }
                 else if (dTempFv <= 0.0d || dTempPv <= 0.0d)
-                    throw new ArgumentException(Utils.GetResourceString("Financial_CannotCalculateNPer"));
+                    throw new ArgumentOutOfRangeException("Cannot calculate number of periods.");
 
                 dTemp4 = Rate + 1.0d;
-                return (Math.Log(dTempFv) - Math.Log(dTempPv)) / Math.Log(dTemp4);
+                return (System.Math.Log(dTempFv) - System.Math.Log(dTempPv)) / System.Math.Log(dTemp4);
             }
         }
 
@@ -475,9 +483,9 @@ namespace LoanCalculator
         // As with the others, this function puts its status in *lpwStatus,
         // and returns the result as a double.
         // 
-        // Value1       Value2      Value3
+        //       Value1       Value2      Value3
         // npv = -------- + ---------- + ---------- + ... for the series...
-        // (1+rate)   (1+rate)^2   (1+rate)^3
+        //       (1+rate)   (1+rate)^2   (1+rate)^3
         // 
         // 
         // Returns    : Double
@@ -491,19 +499,19 @@ namespace LoanCalculator
             int lUpper;
 
             if ((ValueArray == null))
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidNullValue1", "ValueArray"));
+                throw new ArgumentOutOfRangeException("ValueArray", null, "The array for cash flows is empty.");
 
             if (ValueArray.Rank != 1)
-                throw new ArgumentException(Utils.GetResourceString(".Argument_RankEQOne1", "ValueArray"));
+                throw new ArgumentOutOfRangeException("ValueArray", null, "The array for cash flows must be one-dimensional.");
 
             lLower = 0;
             lUpper = ValueArray.GetUpperBound(0);
             lCVal = lUpper - lLower + 1;
 
             if (Rate == (-1.0d))
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "Rate"));
+                throw new ArgumentOutOfRangeException("Rate", Rate, "The value given for Rate is out of range.");
             if (lCVal < 1)
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "ValueArray"));
+                throw new ArgumentOutOfRangeException("ValueArray", null, "The array holding cash flows must contain at least two entries.");
 
             return LDoNPV(Rate, ref ValueArray, 0);
         }
@@ -513,35 +521,34 @@ namespace LoanCalculator
         // -------------------------------------------------------------
         // 
         // Name                      : PMT
-        // Purpose                   :
-        // This function, together with the four following
-        // it (Pv, Fv, NPer and Rate), can calculate
-        // a certain value associated with a regular series of
-        // equal-sized payments.  This series can be fully described
-        // by these values:
-        // Pv   - present value
-        // Fv   - future value (at end of series)
-        // PMT  - the regular payment
-        // nPer - the number of 'periods' over which the
-        // money is paid
-        // Rate - the interest rate per period.
-        // (type - payments at beginning (1) or end (0) of
-        // the period).
-        // Each function can determine one of the values, given the others.
+        // Purpose                   : This function, together with the four following
+        //                             it (Pv, Fv, NPer and Rate), can calculate
+        //                             a certain value associated with a regular series of
+        //                             equal-sized payments.  This series can be fully described
+        //                             by these values:
+        //                                Pv   - present value
+        //                                Fv   - future value(at end of series)
+        //                                PMT  - the regular payment
+        //                                nPer - the number of 'periods' over which the
+        //                                       money is paid
+        //                                Rate - the interest rate per period.
+        //                                type - payments at beginning(1) or end(0) of
+        //                                       the period.
+        //                             Each function can determine one of the values, given the others.
         // 
         // General Function for the above values:
         // 
-        // (1+rate)^nper - 1
+        //                                         (1+rate)^nper - 1
         // pv * (1+rate)^nper + PMT*(1+rate*type)*----------------- + fv  = 0
-        // rate
+        //                                              rate
         // rate == 0  ->  pv + PMT*nper + fv = 0
         // 
         // Thus:
-        // (-fv - pv*(1+rate)^nper) * rate
+        //          (-fv - pv*(1+rate)^nper) * rate
         // PMT = -------------------------------------
-        // (1+rate*type) * ( (1+rate)^nper - 1 )
+        //       (1+rate*type) * ( (1+rate)^nper - 1 )
         // 
-        // PMT = (-fv - pv) / nper    : if rate == 0
+        // PMT = (-fv - pv) / nper   : if rate == 0
         // 
         // 
         // Returns                   : Double
@@ -561,7 +568,7 @@ namespace LoanCalculator
 
             // Checking for error conditions
             if (NPer == 0.0d)
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "NPer"));
+                throw new ArgumentOutOfRangeException("NPer", NPer, "Number of periods must be greater than zero.");
 
             if (Rate == 0.0d)
                 return ((-FV - PV) / NPer);
@@ -574,7 +581,7 @@ namespace LoanCalculator
                 dTemp3 = Rate + 1.0d;
                 // WARSI Using the exponent operator for pow(..) in C code of PMT. Still got
                 // to make sure that they (pow and ^) are same for all conditions
-                dTemp2 = Math.Pow(dTemp3, NPer);
+                dTemp2 = System.Math.Pow(dTemp3, NPer);
                 return ((-FV - PV * dTemp2) / (dTemp * (dTemp2 - 1.0d)) * Rate);
             }
         }
@@ -585,10 +592,10 @@ namespace LoanCalculator
         // 
         // Name                      : PPmt
         // Purpose                   : This function calculates the principal part of a
-        // payment for a given period.
+        //                             payment for a given period.
         // 
-        // Since PMT = IPMT +PPMT therefore
-        // PPMT = PMT - IPMT
+        //                             Since PMT = IPMT +PPMT therefore
+        //                             PPMT = PMT - IPMT
         // 
         // Returns                   : Double
         // 
@@ -601,7 +608,7 @@ namespace LoanCalculator
 
             // Checking for error conditions
             if ((Per <= 0.0d) || (Per >= (NPer + 1)))
-                throw new ArgumentException(Utils.GetResourceString("PPMT_PerGT0AndLTNPer", "Per"));
+                throw new ArgumentOutOfRangeException("Per", Per, "Period must be greater than zero and less than or equal to the total number of periods");
 
             Pmt = PMT_Internal(Rate, NPer, PV, FV, Due);
             dIPMT = IPmt(Rate, Per, NPer, PV, FV, Due);
@@ -615,9 +622,9 @@ namespace LoanCalculator
         // 
         // Name       : PV
         // Purpose    :
-        // -fv - PMT * (1+rate*type) * ( (1+rate)^nper-1) / rate
+        //      -fv - PMT * (1+rate*type) * ( (1+rate)^nper-1) / rate
         // pv = -----------------------------------------------------
-        // (1 + rate) ^ nper
+        //                        (1 + rate) ^ nper
         // 
         // pv = -fv - PMT * nper     : if rate == 0
         // Returns    : Double
@@ -642,7 +649,7 @@ namespace LoanCalculator
 
                 // WARSI Using the exponent operator for pow(..) in C code of PV. Still got
                 // to make sure that they (pow and ^) are same for all conditions
-                dTemp2 = Math.Pow(dTemp3, NPer);
+                dTemp2 = System.Math.Pow(dTemp3, NPer);
 
                 // Do divides before multiplies to avoid OverFlowExceptions
                 return (-(FV + Pmt * dTemp * ((dTemp2 - 1.0d) / Rate)) / dTemp2);
@@ -654,21 +661,20 @@ namespace LoanCalculator
         // -------------------------------------------------------------
         // 
         // Name       : Rate
-        // Purpose    :
-        // See PMT, above, for general details.  This
-        // function is not as simple as the others.  Due to the
-        // nature of the equation that links the 5 values (see
-        // Excel manual - PV), it is not practical to solve for
-        // rate algebraically.  As a result, this function implements
-        // the secant method of approximation.  LEvalRate provides
-        // the 'Y-values', for given rates.
+        // Purpose    : See PMT, above, for general details.  This
+        //              function is not as simple as the others.  Due to the
+        //              nature of the equation that links the 5 values (see
+        //              Excel manual - PV), it is not practical to solve for
+        //              rate algebraically.  As a result, this function implements
+        //              the secant method of approximation.  LEvalRate provides
+        //              the 'Y-values', for given rates.
         // 
         // Basic secant method:
         // determine Rate0 and Rate1.  Use LEvalRate to get Y0, Y1.
         // 
-        // Y0
+        //                                      Y0
         // Rate2 = Rate1 - (Rate1 - Rate0) * ---------
-        // (Y1 - Y0)
+        //                                   (Y1 - Y0)
         // 
         // Get Y2 from Rate2, LEvalRate.  move 1->0, 2->1 and repeat.
         // 
@@ -690,7 +696,7 @@ namespace LoanCalculator
 
             // Check for error condition
             if (NPer <= 0.0d)
-                throw new ArgumentException(Utils.GetResourceString("Rate_NPerMustBeGTZero"));
+                throw new ArgumentOutOfRangeException("Number of periods must be greater than zero.");
 
             dRate0 = Guess;
             dY0 = LEvalRate(dRate0, NPer, Pmt, PV, FV, Due);
@@ -711,14 +717,14 @@ namespace LoanCalculator
                         dRate0 -= cnL_IT_STEP * (-1);
                     dY0 = LEvalRate(dRate0, NPer, Pmt, PV, FV, Due);
                     if (dY1 == dY0)
-                        throw new ArgumentException(Utils.GetResourceString("Financial_CalcDivByZero"));
+                        throw new ArgumentOutOfRangeException("Unable to calculate Rate because of a divide-by-zero error.");
                 }
 
                 dRate0 = dRate1 - (dRate1 - dRate0) * dY1 / (dY1 - dY0);
 
                 // Secant method of generating next approximation
                 dY0 = LEvalRate(dRate0, NPer, Pmt, PV, FV, Due);
-                if (Math.Abs(dY0) < cnL_IT_EPSILON)
+                if (System.Math.Abs(dY0) < cnL_IT_EPSILON)
                     return dRate0;
 
                 dTemp = dY0;
@@ -729,7 +735,7 @@ namespace LoanCalculator
                 dRate1 = dTemp;
             }
 
-            throw new ArgumentException(Utils.GetResourceString("Financial_CannotCalculateRate"));
+            throw new ArgumentOutOfRangeException("Unable to calculate Rate.");
         }
 
 
@@ -738,10 +744,10 @@ namespace LoanCalculator
         // 
         // Name                      : SLN
         // Purpose                   : It calculates the depreciation by the straight
-        // line method and returns the result. It raises
-        // an error if parameters are invalid.
+        //                             line method and returns the result. It raises
+        //                             an error if parameters are invalid.
         // 
-        // sln = (value - salvage) / nper
+        //                             sln = (value - salvage) / nper
         // 
         // Returns                   : Double
         // 
@@ -750,7 +756,7 @@ namespace LoanCalculator
         public static double SLN(double Cost, double Salvage, double Life)
         {
             if (Life == 0.0d)
-                throw new ArgumentException(Utils.GetResourceString("Financial_LifeNEZero"));
+                throw new ArgumentOutOfRangeException("Life of asset must not equal zero periods.");
 
             return (Cost - Salvage) / (Life);
         }
@@ -780,11 +786,11 @@ namespace LoanCalculator
             double Result;
 
             if (Salvage < 0.0d)
-                throw new ArgumentException(Utils.GetResourceString("Financial_ArgGEZero1", "Salvage"));
+                throw new ArgumentOutOfRangeException("Salvage", Salvage, "Salvage value must not be less than zero.");
             if (Period > Life)
-                throw new ArgumentException(Utils.GetResourceString("Financial_PeriodLELife"));
+                throw new ArgumentOutOfRangeException("Period", Period, "Period must not be greater than Life. Life is given to be " + Life.ToString() + " periods.");
             if (Period <= 0.0d)
-                throw new ArgumentException(Utils.GetResourceString("Financial_ArgGTZero1", "Period"));
+                throw new ArgumentOutOfRangeException("Period", Period, "Period must be greater than zero.");
 
             // Avoid OverflowExceptions by dividing before multiplying
             Result = (Cost - Salvage) / (Life * (Life + 1));
@@ -815,7 +821,7 @@ namespace LoanCalculator
                 dTemp3 = Rate + 1.0d;
                 // WARSI Using the exponent operator for pow(..) in C code of LEvalRate. Still got
                 // to make sure that they (pow and ^) are same for all conditions
-                dTemp1 = Math.Pow(dTemp3, NPer);
+                dTemp1 = System.Math.Pow(dTemp3, NPer);
 
                 if (Due != 0)
                     dTemp2 = 1 + Rate;
@@ -840,9 +846,9 @@ namespace LoanCalculator
         // Since this is just an internal-use function, no fancy exports
         // are done.  It assumes that error checking is done by the caller.
         // 
-        // Value1      Value2       Value3
+        //        Value1      Value2       Value3
         // npv = -------- + ---------- + ---------- + ... for the series...
-        // (1+rate)   (1+rate)^2   (1+rate)^3
+        //       (1+rate)   (1+rate)^2   (1+rate)^3
         // 
         // Returns                   : Double
         // 
@@ -952,8 +958,14 @@ namespace LoanCalculator
             decimal mNTemp;
 
             // Handle invalid parameters
-            if (Factor <= 0.0m || Salvage < 0.0m || Period <= 0.0m || Period > Life)
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "Factor"));
+            if (Factor <= 0.0m)
+                throw new ArgumentOutOfRangeException("Factor must be greater than zero.");
+            if (Salvage < 0.0m)
+                throw new ArgumentOutOfRangeException("Salvage must be greater than zero.");
+            if (Period <= 0.0m)
+                throw new ArgumentOutOfRangeException("Period must be greater than zero.");
+            if (Period > Life)
+                throw new ArgumentOutOfRangeException("Period must be less than or equal to Life.");
 
             // Handle special (trivial) cases
             if (Cost <= 0.0m)
@@ -984,13 +996,13 @@ namespace LoanCalculator
 
             // WARSI Using the exponent operator for pow(..) in C code of DDB. Still got
             // to make sure that they (pow and ^) are same for all conditions
-            mRet = Factor * Cost / Life * SimpleLoanCalculator.Math.Pow(mTemp, (int)mNTemp);
+            mRet = Factor * Cost / Life * Math.Pow(mTemp, (int)mNTemp);
             //            mRet = Factor * Cost / Life * (decimal)Math.Pow((double)mTemp, (double)mNTemp);
 
             // WARSI Using the exponent operator for pow(..) in C code of DDB. Still got
             // to make sure that they (pow and ^) are same for all conditions
-            mTot = Cost * (1 - SimpleLoanCalculator.Math.Pow(mTemp, (int)Period));
-//            mTot = Cost * (1 - (decimal)Math.Pow((double)mTemp, (double)Period));
+            mTot = Cost * (1 - Math.Pow(mTemp, (int)Period));
+            //            mTot = Cost * (1 - (decimal)Math.Pow((double)mTemp, (double)Period));
             mExcess = mTot - Cost + Salvage;
 
             if (mExcess > 0.0m)
@@ -1042,7 +1054,7 @@ namespace LoanCalculator
                 mTemp = 1.0m;
 
             mTemp3 = 1.0m + Rate;
-            mTemp2 = SimpleLoanCalculator.Math.Pow(mTemp3, (int)NPer);
+            mTemp2 = Math.Pow(mTemp3, (int)NPer);
             //mTemp2 = (decimal)Math.Pow((double)mTemp3, (double)NPer);
 
             // Do divides before multiplies to avoid OverflowExceptions
@@ -1084,7 +1096,7 @@ namespace LoanCalculator
 
             // Type = 0 or non-zero only. Offset to calculate FV
             if ((Per <= 0.0m) || (Per >= NPer + 1))
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "Per"));
+                throw new ArgumentOutOfRangeException("Per");
 
             if ((Due != DueDate.EndOfPeriod) && (Per == 1.0m))
                 return 0.0m;
@@ -1159,19 +1171,20 @@ namespace LoanCalculator
             {
                 throw ex;
             }
-            catch
+            catch (Exception ex)
             {
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "ValueArray"));
+                throw ex;
             }
+
 
             lCVal = lUpper + 1;
 
             // Function fails for invalid parameters
             if (Guess <= (-1.0m))
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "Guess"));
+                throw new ArgumentOutOfRangeException("Guess", Guess, "Guess must be greater than -1.0.");
 
             if (lCVal <= 1)
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "ValueArray"));
+                throw new ArgumentOutOfRangeException("ValueArray", Guess, "ValueArray size must be greater than 0.");
 
             // We scale the epsilon depending on cash flow values. It is necessary
             // because even in max accuracy case where diff is in 16th digit it
@@ -1202,7 +1215,7 @@ namespace LoanCalculator
                 mRate1 = mRate0 - (decimal)cnL_IT_STEP;
 
             if (mRate1 <= (-1.0m))
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "Rate"));
+                throw new ArgumentOutOfRangeException("mRate1", mRate1, "Rate must be greater than -1.0.");
 
             mNpv1 = OptPV2(ref ValueArray, mRate1);
 
@@ -1216,7 +1229,7 @@ namespace LoanCalculator
                         mRate0 += (decimal)cnL_IT_STEP;
                     mNPv0 = OptPV2(ref ValueArray, mRate0);
                     if (mNpv1 == mNPv0)
-                        throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue"));
+                        throw new ArgumentOutOfRangeException("mNpv1", mNpv1, "mNpv1 must not be equal to mNpv0.");
                 }
 
                 mRate0 = mRate1 - (mRate1 - mRate0) * mNpv1 / (mNpv1 - mNPv0);
@@ -1251,7 +1264,7 @@ namespace LoanCalculator
                 mRate1 = mTemp;
             }
 
-            throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue"));
+            throw new ArgumentOutOfRangeException("mRate0", mRate0, "mRate0 must be between " + mNpvEpsilon.ToString() + " and " + cnL_IT_EPSILON.ToString() + ".");
         }
 
 
@@ -1275,37 +1288,37 @@ namespace LoanCalculator
             int lUpper;
 
             if (ValueArray.Rank != 1)
-                throw new ArgumentException(Utils.GetResourceString(".Argument_RankEQOne1", "ValueArray"));
+                throw new ArgumentOutOfRangeException("ValueArray.Rank", ValueArray.Rank, "ValueArray rank must be 1.");
 
             lLower = 0;
             lUpper = ValueArray.GetUpperBound(0);
             lCVal = lUpper - lLower + 1;
 
             if (FinanceRate == -1.0m)
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "FinanceRate"));
+                throw new ArgumentOutOfRangeException("FinanceRate", FinanceRate, "FinanceRate must not be equal to -1");
 
             if (ReinvestRate == -1.0m)
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "ReinvestRate"));
+                throw new ArgumentOutOfRangeException("ReinvestRate", ReinvestRate, "ReinvestRate must not be equal to -1");
 
             if (lCVal <= 1)
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "ValueArray"));
+                throw new ArgumentOutOfRangeException("ValueArray", null, "ValueArray must have at least one element.");
 
             mNpvNeg = LDoNPV(FinanceRate, ref ValueArray, -1);
             if (mNpvNeg == 0.0m)
-                throw new DivideByZeroException(Utils.GetResourceString("Financial_CalcDivByZero"));
+                throw new DivideByZeroException("MIRR cannot be calculated.");
 
             mNpvPos = LDoNPV(ReinvestRate, ref ValueArray, 1); // npv of +ve values
             mTemp1 = ReinvestRate + 1.0m;
             mNTemp2 = lCVal;
 
-            mTemp = -mNpvPos * SimpleLoanCalculator.Math.Pow(mTemp1, (int)mNTemp2) / (mNpvNeg * (FinanceRate + 1.0m));
+            mTemp = -mNpvPos * Math.Pow(mTemp1, (int)mNTemp2) / (mNpvNeg * (FinanceRate + 1.0m));
             //mTemp = -mNpvPos * (decimal)Math.Pow((double)mTemp1, (double)mNTemp2) / (mNpvNeg * (FinanceRate + 1.0m));
 
             if (mTemp < 0.0m)
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue"));
+                throw new ArgumentOutOfRangeException("MIRR cannot be calculated.");
 
             mTemp1 = 1 / (lCVal - 1.0m);
-            return SimpleLoanCalculator.Math.Pow(mTemp, (int)mTemp1) - 1.0m;
+            return Math.Pow(mTemp, (int)mTemp1) - 1.0m;
             //return (decimal)Math.Pow((double)mTemp, (double)mTemp1) - 1.0m;
         }
 
@@ -1337,12 +1350,12 @@ namespace LoanCalculator
 
             // Checking Error Conditions
             if (Rate <= -1.0m)
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "Rate"));
+                throw new ArgumentOutOfRangeException("Rate");
 
             if (Rate == 0.0m)
             {
                 if (Pmt == 0.0m)
-                    throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "Pmt"));
+                    throw new ArgumentOutOfRangeException("Pmt");
                 return (-(PV + FV) / Pmt);
             }
             else
@@ -1361,11 +1374,11 @@ namespace LoanCalculator
                     mTempPv = -1 * mTempPv;
                 }
                 else if (mTempFv <= 0.0m || mTempPv <= 0.0m)
-                    throw new ArgumentException(Utils.GetResourceString("Financial_CannotCalculateNPer"));
+                    throw new ArgumentOutOfRangeException("Cannot calculate number of periods.");
 
                 mTemp4 = Rate + 1.0m;
-                return (SimpleLoanCalculator.Math.Ln(mTempFv) - SimpleLoanCalculator.Math.Ln(mTempPv)) / SimpleLoanCalculator.Math.Ln(mTemp4);
-  //              return (decimal)((Math.Log((double)mTempFv) - Math.Log((double)mTempPv)) / Math.Log((double)mTemp4));
+                return (Math.Ln(mTempFv) - Math.Ln(mTempPv)) / Math.Ln(mTemp4);
+                //              return (decimal)((Math.Log((double)mTempFv) - Math.Log((double)mTempPv)) / Math.Log((double)mTemp4));
             }
         }
 
@@ -1392,24 +1405,24 @@ namespace LoanCalculator
         // 
         public static decimal NPV(decimal Rate, ref decimal[] ValueArray)
         {
+
             int lCVal;
             int lLower;
             int lUpper;
-
             if ((ValueArray == null))
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidNullValue1", "ValueArray"));
+                throw new ArgumentOutOfRangeException("ValueArray", null, "The array for cash flows is empty.");
 
             if (ValueArray.Rank != 1)
-                throw new ArgumentException(Utils.GetResourceString(".Argument_RankEQOne1", "ValueArray"));
+                throw new ArgumentOutOfRangeException("ValueArray", null, "The array for cash flows must be one-dimensional.");
 
             lLower = 0;
             lUpper = ValueArray.GetUpperBound(0);
             lCVal = lUpper - lLower + 1;
 
             if (Rate == (-1.0m))
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "Rate"));
+                throw new ArgumentOutOfRangeException("Rate", Rate, "The value given for Rate is out of range.");
             if (lCVal < 1)
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "ValueArray"));
+                throw new ArgumentOutOfRangeException("ValueArray", null, "The array holding cash flows must contain at least two entries.");
 
             return LDoNPV(Rate, ref ValueArray, 0);
         }
@@ -1467,7 +1480,7 @@ namespace LoanCalculator
 
             // Checking for error conditions
             if (NPer == 0.0m)
-                throw new ArgumentException(Utils.GetResourceString("Argument_InvalidValue1", "NPer"));
+                throw new ArgumentOutOfRangeException("NPer");
 
             if (Rate == 0.0m)
                 return ((-FV - PV) / NPer);
@@ -1480,7 +1493,7 @@ namespace LoanCalculator
                 mTemp3 = Rate + 1.0m;
                 // WARSI Using the exponent operator for pow(..) in C code of PMT. Still got
                 // to make sure that they (pow and ^) are same for all conditions
-                mTemp2 = SimpleLoanCalculator.Math.Pow(mTemp3, (int)NPer);
+                mTemp2 = Math.Pow(mTemp3, (int)NPer);
                 //mTemp2 = (decimal)Math.Pow((double)mTemp3, (double)NPer);
                 return ((-FV - PV * mTemp2) / (mTemp * (mTemp2 - 1.0m)) * Rate);
             }
@@ -1508,7 +1521,7 @@ namespace LoanCalculator
 
             // Checking for error conditions
             if ((Per <= 0.0m) || (Per >= (NPer + 1)))
-                throw new ArgumentException(Utils.GetResourceString("PPMT_PerGT0AndLTNPer", "Per"));
+                throw new ArgumentOutOfRangeException("Per", Per, "Period must be greater than zero and less than or equal to the total number of periods");
 
             Pmt = PMT_Internal(Rate, NPer, PV, FV, Due);
             mIPMT = IPmt(Rate, Per, NPer, PV, FV, Due);
@@ -1549,7 +1562,7 @@ namespace LoanCalculator
 
                 // WARSI Using the exponent operator for pow(..) in C code of PV. Still got
                 // to make sure that they (pow and ^) are same for all conditions
-                mTemp2 = SimpleLoanCalculator.Math.Pow(mTemp3, (int)NPer);
+                mTemp2 = Math.Pow(mTemp3, (int)NPer);
                 //mTemp2 = (decimal)Math.Pow((double)mTemp3, (double)NPer);
 
                 // Do divides before multiplies to avoid OverFlowExceptions
@@ -1598,7 +1611,7 @@ namespace LoanCalculator
 
             // Check for error condition
             if (NPer <= 0.0m)
-                throw new ArgumentException(Utils.GetResourceString("Rate_NPerMustBeGTZero"));
+                throw new ArgumentOutOfRangeException("Number of periods must be greater than zero.");
 
             mRate0 = Guess;
             mY0 = LEvalRate(mRate0, NPer, Pmt, PV, FV, Due);
@@ -1619,14 +1632,14 @@ namespace LoanCalculator
                         mRate0 -= (decimal)cnL_IT_STEP * (-1);
                     mY0 = LEvalRate(mRate0, NPer, Pmt, PV, FV, Due);
                     if (mY1 == mY0)
-                        throw new ArgumentException(Utils.GetResourceString("Financial_CalcDivByZero"));
+                        throw new ArgumentOutOfRangeException("Unable to calculate Rate because of a divide-by-zero error.");
                 }
 
                 mRate0 = mRate1 - (mRate1 - mRate0) * mY1 / (mY1 - mY0);
 
                 // Secant method of generating next approximation
                 mY0 = LEvalRate(mRate0, NPer, Pmt, PV, FV, Due);
-                if (Math.Abs(mY0) < (decimal)cnL_IT_EPSILON)
+                if (System.Math.Abs(mY0) < (decimal)cnL_IT_EPSILON)
                     return mRate0;
 
                 mTemp = mY0;
@@ -1637,7 +1650,7 @@ namespace LoanCalculator
                 mRate1 = mTemp;
             }
 
-            throw new ArgumentException(Utils.GetResourceString("Financial_CannotCalculateRate"));
+            throw new ArgumentOutOfRangeException("Unable to calculate Rate.");
         }
 
 
@@ -1646,10 +1659,10 @@ namespace LoanCalculator
         // 
         // Name                      : SLN
         // Purpose                   : It calculates the depreciation by the straight
-        // line method and returns the result. It raises
-        // an error if parameters are invalid.
+        //                             line method and returns the result. It raises
+        //                             an error if parameters are invalid.
         // 
-        // sln = (value - salvage) / nper
+        //                             sln = (value - salvage) / nper
         // 
         // Returns                   : decimal
         // 
@@ -1658,7 +1671,7 @@ namespace LoanCalculator
         public static decimal SLN(decimal Cost, decimal Salvage, decimal Life)
         {
             if (Life == 0.0m)
-                throw new ArgumentException(Utils.GetResourceString("Financial_LifeNEZero"));
+                throw new ArgumentOutOfRangeException("Life of asset must not equal zero periods.");
 
             return (Cost - Salvage) / (Life);
         }
@@ -1669,16 +1682,16 @@ namespace LoanCalculator
         // 
         // Name       : SYD
         // Purpose    : Calculates depreciation for a period by the
-        // sum-of-years-digits method. The result is returned.
-        // It raises an error if parameters are invalid.
+        //              sum-of-years-digits method. The result is returned.
+        //              It raises an error if parameters are invalid.
         // 
-        // 2
+        //                                                 2
         // syd = (value - salvage) (nper - per + 1) * ------------
-        // (nper)(nper + 1)
+        //                                          (nper)(nper + 1)
         // 
         // Derivation : The value of the asset is divided into even parts.
-        // The first period gets N, the second gets N-1, the last
-        // gets 1.
+        //              The first period gets N, the second gets N-1, the last
+        //              gets 1.
         // Returns    : decimal
         // 
         // -------------------------------------------------------------
@@ -1688,11 +1701,11 @@ namespace LoanCalculator
             decimal Result;
 
             if (Salvage < 0.0m)
-                throw new ArgumentException(Utils.GetResourceString("Financial_ArgGEZero1", "Salvage"));
+                throw new ArgumentOutOfRangeException("Salvage", Salvage, "Salvage value must not be less than zero.");
             if (Period > Life)
-                throw new ArgumentException(Utils.GetResourceString("Financial_PeriodLELife"));
+                throw new ArgumentOutOfRangeException("Period", Period, "Period must not be greater than Life. Life is given to be " + Life.ToString() + " periods.");
             if (Period <= 0.0m)
-                throw new ArgumentException(Utils.GetResourceString("Financial_ArgGTZero1", "Period"));
+                throw new ArgumentOutOfRangeException("Period", Period, "Period must be greater than zero.");
 
             // Avoid OverflowExceptions by dividing before multiplying
             Result = (Cost - Salvage) / (Life * (Life + 1));
@@ -1723,7 +1736,7 @@ namespace LoanCalculator
                 mTemp3 = Rate + 1.0m;
                 // WARSI Using the exponent operator for pow(..) in C code of LEvalRate. Still got
                 // to make sure that they (pow and ^) are same for all conditions
-                mTemp1 = SimpleLoanCalculator.Math.Pow(mTemp3, (int)NPer);
+                mTemp1 = Math.Pow(mTemp3, (int)NPer);
                 //mTemp1 = (decimal)Math.Pow((double)mTemp3, (double)NPer);
 
                 if (Due != 0)
@@ -1815,5 +1828,64 @@ namespace LoanCalculator
             }
             return mTotal;
         }
+    }
+    public static class Math
+    {
+        //Math functions for decimal data type
+        private const int LN_ITERATIONS = 150;
+
+        public static decimal Pow(decimal Base, int Exponent)
+        {
+            //if (Base <= 0)
+            //    throw new ArgumentOutOfRangeException("Base must be greater than 0.");
+            //else 
+            if (System.Math.Abs(Exponent) == 1)
+                return Base;
+            else if (Exponent == 0)
+                return 1;
+            else if (Exponent < 0)
+                return 1 / Pow(Base, System.Math.Abs(Exponent));
+            else
+            {
+                decimal result = 1m;
+                for (int i = 1; i <= Exponent; i++)
+                    result *= Base;
+                return result;
+            }
+        }
+
+        // Function to calculate ln(x) using series expansion
+        //        LN_ITERATIONS
+        // ln(x) = 2 * Σ(((x-1)/(x+1))^(2n-1)/(2n-1)) for x>0
+        //            n=1
+        public static decimal Ln(decimal x)
+        {
+            decimal numerator, numeratorBase, result = 0;
+            int denominator, numeratorExponent;
+            if (x <= 0m)
+                throw new ArgumentOutOfRangeException("Argument for Ln(x) must be greater than 0");
+
+            numeratorBase = (x - 1) / (x + 1);
+
+            for (int n = 1; n <= LN_ITERATIONS; n++)
+            {
+                numeratorExponent = denominator = (2 * n) - 1;
+                numerator = Pow(numeratorBase, numeratorExponent);
+                decimal term = numerator / (decimal)denominator;
+                result += term;
+            }
+            return 2 * result;
+        }
+        public static decimal Log(decimal a, decimal baseOfLog)
+        {
+            return (Ln(a) / Ln(baseOfLog));
+        }
+
+        // Function to calculate log10 x 
+        public static decimal Log10(decimal x)
+        {
+            return Log(x, 10);
+        }
+
     }
 }

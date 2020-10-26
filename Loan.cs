@@ -1,7 +1,8 @@
 ﻿using System;
-using Microsoft.VisualBasic;
+using static SimpleLoanCalculator.Financial;
+//using Microsoft.VisualBasic;
 
-namespace LoanCalculator
+namespace SimpleLoanCalculator
 {
     public static class Loan
     { 
@@ -53,11 +54,11 @@ namespace LoanCalculator
                 = Financial.PV(InterestRate / 1200, NumberPayments,
                     -MonthlyPayment, 0, WhenDue);
 
-            CompensatingBalance = Math.Round(CompensatingBalance, 2);
-            AmountFinanced = Math.Round(AmountFinanced, 2);
-            TradeIn = Math.Round(TradeIn, 2);
-            AmountStillOwed = Math.Round(AmountStillOwed, 2);
-            DownPayment = Math.Round(DownPayment, 2);
+            CompensatingBalance = System.Math.Round(CompensatingBalance, 2);
+            AmountFinanced = System.Math.Round(AmountFinanced, 2);
+            TradeIn = System.Math.Round(TradeIn, 2);
+            AmountStillOwed = System.Math.Round(AmountStillOwed, 2);
+            DownPayment = System.Math.Round(DownPayment, 2);
 
             SalePrice = AmountFinanced + CompensatingBalance;
         }
@@ -65,19 +66,19 @@ namespace LoanCalculator
         public static void CalculateInterestRate()
         {
             InterestRate
-                = Math.Abs(Financial.Rate(NumberPayments, -MonthlyPayment,
+                = System.Math.Abs(Financial.Rate(NumberPayments, -MonthlyPayment,
                     AmountFinanced, 0, WhenDue, 0.1) * 1200);
 
-            InterestRate = Math.Round(InterestRate, 6);
+            InterestRate = System.Math.Round(InterestRate, 6);
         }
 
         public static void CalculateMonthlyPayment()
         {
             MonthlyPayment
-                = Math.Abs(Financial.Pmt(InterestRate / 1200, NumberPayments,
+                = System.Math.Abs(Financial.Pmt(InterestRate / 1200, NumberPayments,
                     AmountFinanced, 0, WhenDue));
 
-            MonthlyPayment = Math.Round(MonthlyPayment, 2);
+            MonthlyPayment = System.Math.Round(MonthlyPayment, 2);
         }
 
         public static void CalculateNumberPayments()
@@ -86,7 +87,7 @@ namespace LoanCalculator
                 = Financial.NPer(InterestRate / 1200, -MonthlyPayment,
                     AmountFinanced, 0, WhenDue);
 
-            NumberPayments = Math.Round(NumberPayments, 0);
+            NumberPayments = System.Math.Round(NumberPayments, 0);
         }
     }
 }
