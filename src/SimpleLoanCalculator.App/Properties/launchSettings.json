@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "SimpleLoanCalculator.App (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "SimpleLoanCalculator.App (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

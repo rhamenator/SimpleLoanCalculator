@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@26b0ec14cb23fa6904739307f278c14f94c95bf1 # v5.4.0
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Restore
+        run: dotnet restore SimpleLoanCalculator.slnx --locked-mode
+
+      - name: Test calculation engine
+        run: dotnet test tests/SimpleLoanCalculator.Core.Tests/SimpleLoanCalculator.Core.Tests.csproj --configuration Release --no-restore
+
+      - name: Build WinUI application
+        run: dotnet build src/SimpleLoanCalculator.App/SimpleLoanCalculator.App.csproj --configuration Release --no-restore -p:Platform=x64

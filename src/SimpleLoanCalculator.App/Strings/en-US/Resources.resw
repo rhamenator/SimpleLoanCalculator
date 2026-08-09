@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="CalculateCommand.Label" xml:space="preserve"><value>Calculate</value></data>
+  <data name="CopyScheduleCommand.Label" xml:space="preserve"><value>Copy schedule</value></data>
+  <data name="ResetCommand.Label" xml:space="preserve"><value>Reset</value></data>
+  <data name="LoanWorksheetHeading.Text" xml:space="preserve"><value>Loan worksheet</value></data>
+  <data name="PrincipalInput.Header" xml:space="preserve"><value>Amount financed</value></data>
+  <data name="AnnualRateInput.Header" xml:space="preserve"><value>Annual rate (%)</value></data>
+  <data name="NumberOfPaymentsInput.Header" xml:space="preserve"><value>Number of payments</value></data>
+  <data name="PaymentsPerYearInput.Header" xml:space="preserve"><value>Payments per year</value></data>
+  <data name="PaymentTimingInput.Header" xml:space="preserve"><value>Payment timing</value></data>
+  <data name="EndOfPeriodOption.Content" xml:space="preserve"><value>End of period</value></data>
+  <data name="BeginningOfPeriodOption.Content" xml:space="preserve"><value>Beginning of period</value></data>
+  <data name="SolveTargetInput.Header" xml:space="preserve"><value>Solve for</value></data>
+  <data name="PeriodicPaymentOption.Content" xml:space="preserve"><value>Periodic payment</value></data>
+  <data name="PrincipalOption.Content" xml:space="preserve"><value>Amount financed</value></data>
+  <data name="AnnualRateOption.Content" xml:space="preserve"><value>Annual rate</value></data>
+  <data name="NumberOfPaymentsOption.Content" xml:space="preserve"><value>Number of payments</value></data>
+  <data name="KnownPaymentInput.Header" xml:space="preserve"><value>Known periodic payment</value></data>
+  <data name="KnownPaymentInput.PlaceholderText" xml:space="preserve"><value>Used by reverse calculations</value></data>
+  <data name="MonetaryUnitInput.Header" xml:space="preserve"><value>Monetary unit</value></data>
+  <data name="DisplayScaleInput.Header" xml:space="preserve"><value>Decimal places</value></data>
+  <data name="CalculateButton.Content" xml:space="preserve"><value>Calculate</value></data>
+  <data name="PurchaseWorksheet.Header" xml:space="preserve"><value>Purchase and trade-in worksheet</value></data>
+  <data name="PurchaseFormula.Text" xml:space="preserve"><value>Amount financed = sale price − trade-in + trade-in payoff − down payment.</value></data>
+  <data name="SalePriceInput.Header" xml:space="preserve"><value>Sale price</value></data>
+  <data name="TradeInInput.Header" xml:space="preserve"><value>Trade-in value</value></data>
+  <data name="TradeInPayoffInput.Header" xml:space="preserve"><value>Trade-in payoff</value></data>
+  <data name="DownPaymentInput.Header" xml:space="preserve"><value>Down payment</value></data>
+  <data name="UseAmountFinancedButton.Content" xml:space="preserve"><value>Use calculated amount financed</value></data>
+  <data name="EstimateDisclaimer.Text" xml:space="preserve"><value>Results are estimates, not lending, legal, accounting, or financial advice. Confirm lender conventions, fees, compounding, and final-payment adjustments.</value></data>
+  <data name="ResultsHeading.Text" xml:space="preserve"><value>Results</value></data>
+  <data name="ResultsPrompt.Text" xml:space="preserve"><value>Calculate a loan to see its payment and amortization schedule.</value></data>
+  <data name="PeriodicPaymentHeading.Text" xml:space="preserve"><value>Periodic payment</value></data>
+  <data name="TotalPaidHeading.Text" xml:space="preserve"><value>Total paid</value></data>
+  <data name="TotalInterestHeading.Text" xml:space="preserve"><value>Total interest</value></data>
+  <data name="ScheduleHeading.Text" xml:space="preserve"><value>Amortization schedule</value></data>
+  <data name="PeriodColumn.Text" xml:space="preserve"><value>Period</value></data>
+  <data name="PaymentColumn.Text" xml:space="preserve"><value>Payment</value></data>
+  <data name="PrincipalColumn.Text" xml:space="preserve"><value>Principal</value></data>
+  <data name="InterestColumn.Text" xml:space="preserve"><value>Interest</value></data>
+  <data name="BalanceColumn.Text" xml:space="preserve"><value>Balance</value></data>
+</root>
