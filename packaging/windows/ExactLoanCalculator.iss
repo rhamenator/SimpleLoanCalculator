@@ -10,6 +10,8 @@
 #endif
 
 [Setup]
+UninstallDisplayIcon={app}\app-icon.ico
+SetupIconFile=app-icon.ico
 AppId={{8C28E7E6-A14E-4F97-A9AC-923C0F743A91}
 AppName={#AppName}
 AppVersion={#AppVersion}
@@ -23,7 +25,8 @@ ArchitecturesAllowed={#AppArch}
 ArchitecturesInstallIn64BitMode={#AppArch}
 
 [Files]
+Source: "app-icon.ico"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\..\publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
-Name: "{group}\Exact Loan Calculator"; Filename: "{app}\SimpleLoanCalculator.App.exe"
+Name: "{group}\Exact Loan Calculator"; Filename: "{app}\SimpleLoanCalculator.App.exe"; IconFilename: "{app}\app-icon.ico"
