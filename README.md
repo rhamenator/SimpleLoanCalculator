@@ -1,3 +1,7 @@
+<p align="center">
+  <img src=".github/assets/logo.png" alt="Simple Loan Calculator logo" width="220">
+</p>
+
 # Exact Loan Calculator
 
 A modern Windows loan calculator for ordinary financing and extraordinary monetary scales. It calculates payments and full amortization schedules without `Microsoft.VisualBasic.Financial`, floating-point money, or fixed-size decimal limits.
