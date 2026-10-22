@@ -4,6 +4,21 @@ A modern Windows loan calculator for ordinary financing and extraordinary moneta
 
 The desktop UI uses C# and WinUI through the current Windows App SDK. The calculation engine is a separate .NET library so it can also be reused by projects such as LendWise.
 
+## Install on Windows
+
+Download the installer for your PC:
+
+- **[Download for Windows x64](https://github.com/rhamenator/SimpleLoanCalculator/releases/latest/download/ExactLoanCalculator-win-x64-setup.exe)** — most Intel and AMD PCs.
+- **[Download for Windows ARM64](https://github.com/rhamenator/SimpleLoanCalculator/releases/latest/download/ExactLoanCalculator-win-arm64-setup.exe)** — Windows on Arm PCs.
+
+Run the downloaded setup file and choose **Install**. The app installs for your Windows account without requesting administrator access. Open **Exact Loan Calculator** from Start, or choose the optional desktop shortcut during setup. No .NET SDK, Developer Mode, or separate runtime installation is required.
+
+Requires Windows 10 version 1809 or later. To check your PC type, open **Settings → System → About → System type**. Installers are currently unsigned, so Windows may display a publisher or reputation warning. Release downloads include SHA-256 checksums.
+
+To update, run the newer installer for the same architecture. Remove the app through **Settings → Apps**. If an earlier version was installed for all users, uninstall that version first to avoid duplicate entries.
+
+[All releases and checksums](https://github.com/rhamenator/SimpleLoanCalculator/releases/latest).
+
 ## What it does
 
 - Calculates periodic payment, total paid, total interest, and a complete amortization schedule.
@@ -14,6 +29,10 @@ The desktop UI uses C# and WinUI through the current Windows App SDK. The calcul
 - Uses arbitrary-size integers and exact rational intermediates, with configurable decimal display precision.
 - Exports the displayed amortization schedule to the clipboard as CSV.
 - Provides an English resource catalog as the starting point for additional UI localizations.
+
+To work backward from a known payment, choose the quantity under **Solve for**, enter the other terms and the known payment, then calculate. The unknown field is disabled and does not require a starting value.
+
+The purchase worksheet works in both directions: use the sale price and adjustments to fill the amount financed, or calculate a sale price from the amount financed. To find a purchase price for a target payment, first solve for **Amount financed**, then use **Calculate sale price from amount financed** in the worksheet.
 
 ## Why the math stays practical
 

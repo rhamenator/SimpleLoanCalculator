@@ -205,6 +205,11 @@
                                 HorizontalAlignment="Left"
                                 Click="UseAmountFinanced_Click"
                                 Content="Use calculated amount financed" />
+                            <Button
+                                x:Uid="UseSalePriceButton"
+                                HorizontalAlignment="Left"
+                                Click="UseSalePrice_Click"
+                                Content="Calculate sale price from amount financed" />
                         </StackPanel>
                     </Expander>
 

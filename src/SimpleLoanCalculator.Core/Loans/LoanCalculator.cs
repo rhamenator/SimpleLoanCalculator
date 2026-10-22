@@ -180,6 +180,25 @@ public static class LoanCalculator
         return new BigCurrency(amount, salePrice.Unit);
     }
 
+    public static BigCurrency CalculateSalePrice(
+        BigCurrency amountFinanced,
+        BigCurrency tradeIn,
+        BigCurrency tradeInPayoff,
+        BigCurrency downPayment)
+    {
+        ValidatePayment(amountFinanced);
+        EnsureSameUnit(amountFinanced, tradeIn);
+        EnsureSameUnit(amountFinanced, tradeInPayoff);
+        EnsureSameUnit(amountFinanced, downPayment);
+        var amount = amountFinanced.Amount + tradeIn.Amount - tradeInPayoff.Amount + downPayment.Amount;
+        if (amount <= BigDecimal.Zero)
+        {
+            throw new InvalidOperationException("The financing adjustments produce a nonpositive sale price.");
+        }
+
+        return new BigCurrency(amount, amountFinanced.Unit);
+    }
+
     private static IReadOnlyList<AmortizationRow> BuildSchedule(
         LoanTerms terms,
         BigRational startingPrincipal,

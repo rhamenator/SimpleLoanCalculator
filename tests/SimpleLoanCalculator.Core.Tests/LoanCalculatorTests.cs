@@ -94,6 +94,47 @@ public sealed class LoanCalculatorTests
         Assert.Equal("37000", amount.Amount.ToPlainString());
     }
 
+    [Theory]
+    [InlineData("50000", "12000", "4000", "5000")]
+    [InlineData("50000", "4000", "12000", "5000")]
+    [InlineData("123456789012345678901234567890.1234", "0", "0", "0")]
+    public void Sale_price_solver_reverses_the_purchase_worksheet(
+        string price, string tradeIn, string payoff, string downPayment)
+    {
+        var financed = LoanCalculator.CalculateAmountFinanced(
+            Money(price), Money(tradeIn), Money(payoff), Money(downPayment));
+
+        var solved = LoanCalculator.CalculateSalePrice(
+            financed, Money(tradeIn), Money(payoff), Money(downPayment));
+
+        Assert.Equal(Money(price), solved);
+    }
+
+    [Fact]
+    public void Sale_price_solver_rejects_mismatched_units()
+    {
+        Assert.Throws<InvalidOperationException>(() => LoanCalculator.CalculateSalePrice(
+            Money("100"), Money("0", "EUR"), Money("0"), Money("0")));
+    }
+
+    [Theory]
+    [InlineData("0")]
+    [InlineData("-100")]
+    public void Sale_price_solver_rejects_nonpositive_amount_financed(string financed)
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() => LoanCalculator.CalculateSalePrice(
+            Money(financed), Money("0"), Money("0"), Money("0")));
+    }
+
+    [Theory]
+    [InlineData("100")]
+    [InlineData("200")]
+    public void Sale_price_solver_rejects_nonpositive_sale_price(string payoff)
+    {
+        Assert.Throws<InvalidOperationException>(() => LoanCalculator.CalculateSalePrice(
+            Money("100"), Money("0"), Money(payoff), Money("0")));
+    }
+
     [Fact]
     public void Hyperinflation_scale_input_does_not_overflow_or_require_custom_transcendentals()
     {

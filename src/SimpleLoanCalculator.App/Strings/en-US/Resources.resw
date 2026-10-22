@@ -44,4 +44,5 @@
   <data name="PrincipalColumn.Text" xml:space="preserve"><value>Principal</value></data>
   <data name="InterestColumn.Text" xml:space="preserve"><value>Interest</value></data>
   <data name="BalanceColumn.Text" xml:space="preserve"><value>Balance</value></data>
+  <data name="UseSalePriceButton.Content" xml:space="preserve"><value>Calculate sale price from amount financed</value></data>
 </root>
