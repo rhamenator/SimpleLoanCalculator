@@ -48,10 +48,11 @@ public sealed partial class MainPage : Page
             return;
         }
 
-        KnownPaymentTextBox.IsEnabled = !string.Equals(
-            item.Tag?.ToString(),
-            nameof(LoanSolveTarget.PeriodicPayment),
-            StringComparison.Ordinal);
+        var target = Enum.Parse<LoanSolveTarget>(item.Tag!.ToString()!);
+        KnownPaymentTextBox.IsEnabled = target != LoanSolveTarget.PeriodicPayment;
+        PrincipalTextBox.IsEnabled = target != LoanSolveTarget.Principal;
+        AnnualRateTextBox.IsEnabled = target != LoanSolveTarget.AnnualRate;
+        NumberOfPaymentsTextBox.IsEnabled = target != LoanSolveTarget.NumberOfPayments;
     }
 
     private void UseAmountFinanced_Click(object sender, RoutedEventArgs e)
@@ -67,6 +68,26 @@ public sealed partial class MainPage : Page
 
             PrincipalTextBox.Text = amount.Amount.ToPlainString();
             ShowStatus(InfoBarSeverity.Success, "Amount financed updated", amount.Format(ReadDisplayScale()));
+        }
+        catch (Exception exception) when (exception is FormatException or ArgumentException or InvalidOperationException)
+        {
+            ShowStatus(InfoBarSeverity.Error, "Check the purchase worksheet", exception.Message);
+        }
+    }
+
+    private void UseSalePrice_Click(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var unit = MonetaryUnitTextBox.Text;
+            var salePrice = LoanCalculator.CalculateSalePrice(
+                Money(PrincipalTextBox.Text, unit, "Amount financed"),
+                MoneyOrZero(TradeInTextBox.Text, unit, "Trade-in value"),
+                MoneyOrZero(TradeInPayoffTextBox.Text, unit, "Trade-in payoff"),
+                MoneyOrZero(DownPaymentTextBox.Text, unit, "Down payment"));
+
+            SalePriceTextBox.Text = salePrice.Amount.ToPlainString();
+            ShowStatus(InfoBarSeverity.Success, "Sale price updated", salePrice.Format(ReadDisplayScale()));
         }
         catch (Exception exception) when (exception is FormatException or ArgumentException or InvalidOperationException)
         {
@@ -128,9 +149,18 @@ public sealed partial class MainPage : Page
     {
         var culture = CultureInfo.CurrentCulture;
         var unit = MonetaryUnitTextBox.Text;
-        var principal = Money(PrincipalTextBox.Text, unit, "Amount financed");
-        var annualRate = ParseDecimal(AnnualRateTextBox.Text, "Annual rate", culture);
-        var payments = ParseInteger(NumberOfPaymentsTextBox.Text, "Number of payments", 1, 10_000);
+        var target = Enum.Parse<LoanSolveTarget>(
+            (SolveTargetComboBox.SelectedItem as ComboBoxItem)?.Tag?.ToString()
+                ?? nameof(LoanSolveTarget.PeriodicPayment));
+        var principal = target == LoanSolveTarget.Principal
+            ? new BigCurrency(BigDecimal.Zero, unit)
+            : Money(PrincipalTextBox.Text, unit, "Amount financed");
+        var annualRate = target == LoanSolveTarget.AnnualRate
+            ? BigDecimal.Zero
+            : ParseDecimal(AnnualRateTextBox.Text, "Annual rate", culture);
+        var payments = target == LoanSolveTarget.NumberOfPayments
+            ? 1
+            : ParseInteger(NumberOfPaymentsTextBox.Text, "Number of payments", 1, 10_000);
         var paymentsPerYear = ParseInteger(PaymentsPerYearTextBox.Text, "Payments per year", 1, 366);
         var scale = ReadDisplayScale();
         var timing = ((PaymentTimingComboBox.SelectedItem as ComboBoxItem)?.Tag?.ToString()) switch
@@ -138,9 +168,7 @@ public sealed partial class MainPage : Page
             nameof(PaymentTiming.BeginningOfPeriod) => PaymentTiming.BeginningOfPeriod,
             _ => PaymentTiming.EndOfPeriod,
         };
-        var target = Enum.Parse<LoanSolveTarget>(
-            (SolveTargetComboBox.SelectedItem as ComboBoxItem)?.Tag?.ToString()
-                ?? nameof(LoanSolveTarget.PeriodicPayment));
+
         BigCurrency? knownPayment = target == LoanSolveTarget.PeriodicPayment
             ? null
             : Money(KnownPaymentTextBox.Text, unit, "Known periodic payment");
