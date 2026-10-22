@@ -33,3 +33,10 @@ The unknown-input fix is a derived requirement from the restored workflow: users
 - `git diff --check`: passed.
 
 Verification is maintainer-style self-review plus automated and desktop checks, not independent human review. UI interaction was checked manually through desktop automation because this repository currently has a core test project and no WinUI UI-test harness.
+## Installation changes
+
+Maintenance objective: make the Windows application easy to install. The existing x64/ARM64 self-contained installer workflow is retained. The setup now defaults to the current account under LocalAppData, does not request elevation, offers a desktop shortcut and launch-on-finish, and uses the approved icon in setup, uninstall, shortcuts, and the executable. Stable release asset names support permanent README download links. Tagged releases use their tag version and include SHA-256 checksums.
+
+An existing all-users installation remains a separate installation; users should uninstall it before moving to the per-user version. The existing application ID remains unchanged for in-place per-user updates. Installers remain unsigned; the README states that limitation. No OS support or dependencies are added.
+
+Verification: the local x64 app build passed with zero warnings/errors. The release workflow compiles both architecture installers and now installs, starts, checks for a responsive window, and uninstalls the x64 app on an isolated Windows runner. ARM64 installers are compiled but not executed on the x64 runner. Final CI results are recorded on the pull request.

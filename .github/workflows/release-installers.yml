@@ -10,7 +10,7 @@ permissions:
   contents: write
 
 env:
-  APP_VERSION: 0.1.${{ github.run_number }}
+  APP_VERSION: 0.2.${{ github.run_number }}
 
 jobs:
   test:
@@ -42,6 +42,13 @@ jobs:
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: 10.0.x
+      - name: Use release tag as the installer version
+        if: github.ref_type == 'tag'
+        shell: pwsh
+        run: |
+          $version = $env:GITHUB_REF_NAME -replace '^v', ''
+          if ($version -notmatch '^\d+\.\d+\.\d+$') { throw "Release tags must use vMAJOR.MINOR.PATCH." }
+          "APP_VERSION=$version" >> $env:GITHUB_ENV
       - name: Publish unpackaged self-contained application
         shell: pwsh
         run: |
@@ -62,6 +69,36 @@ jobs:
             "/DAppRuntime=${{ matrix.rid }}" `
             "/DAppArch=${{ matrix.inno_arch }}" `
             packaging\windows\ExactLoanCalculator.iss
+      - name: Smoke-test per-user installer, application startup, and uninstall
+        if: matrix.rid == 'win-x64'
+        shell: pwsh
+        run: |
+          $installer = Get-Item artifacts/ExactLoanCalculator-win-x64-setup.exe
+          $installDir = Join-Path $env:RUNNER_TEMP 'ExactLoanCalculator-smoke'
+          $install = Start-Process -FilePath $installer.FullName -ArgumentList @(
+            '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART', '/TASKS=', "/DIR=`"$installDir`""
+          ) -WindowStyle Hidden -Wait -PassThru
+          if ($install.ExitCode -ne 0) { throw "Installer failed: $($install.ExitCode)" }
+          $exe = Join-Path $installDir 'SimpleLoanCalculator.App.exe'
+          if (!(Test-Path $exe)) { throw 'Installed application is missing.' }
+          $app = $null
+          try {
+            $app = Start-Process -FilePath $exe -WorkingDirectory $installDir -WindowStyle Hidden -PassThru
+            $deadline = (Get-Date).AddSeconds(45)
+            do {
+              Start-Sleep -Seconds 1
+              $app.Refresh()
+              if ($app.HasExited) { throw "Installed application exited: $($app.ExitCode)" }
+            } while ($app.MainWindowHandle -eq 0 -and (Get-Date) -lt $deadline)
+            if ($app.MainWindowHandle -eq 0 -or !$app.Responding) { throw 'Installed application did not create a responsive window.' }
+          } finally {
+            if ($app -and !$app.HasExited) { Stop-Process -Id $app.Id -Force }
+            $uninstaller = Join-Path $installDir 'unins000.exe'
+            if (Test-Path $uninstaller) {
+              $uninstall = Start-Process -FilePath $uninstaller -ArgumentList '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART' -WindowStyle Hidden -Wait -PassThru
+              if ($uninstall.ExitCode -ne 0) { throw "Uninstall failed: $($uninstall.ExitCode)" }
+            }
+          }
       - uses: actions/upload-artifact@v7
         with:
           name: exact-loan-calculator-${{ matrix.rid }}
@@ -78,6 +115,9 @@ jobs:
           path: release-assets
           pattern: exact-loan-calculator-*
           merge-multiple: true
+      - name: Generate installer checksums
+        working-directory: release-assets
+        run: sha256sum *.exe > SHA256SUMS.txt
       - run: gh release create "$GITHUB_REF_NAME" release-assets/* --generate-notes
         env:
           GH_TOKEN: ${{ github.token }}
